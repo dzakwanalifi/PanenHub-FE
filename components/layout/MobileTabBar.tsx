@@ -38,13 +38,11 @@ export default function MobileTabBar() {
             >
               <div className="relative">
                 <tab.icon className="w-6 h-6" />
-                <ClientOnly>
-                  {tab.badge && tab.badge > 0 && (
-                    <span className="absolute -top-2 -right-2 bg-[#2E7D32] text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
-                      {tab.badge}
-                    </span>
-                  )}
-                </ClientOnly>
+                {tab.badge !== undefined && (
+                  <span className={`absolute -top-2 -right-2 bg-[#2E7D32] text-white text-xs rounded-full w-5 h-5 flex items-center justify-center ${tab.badge > 0 ? '' : 'hidden'}`}>
+                    {tab.badge}
+                  </span>
+                )}
               </div>
               <span className="text-xs mt-1">{tab.label}</span>
             </Link>

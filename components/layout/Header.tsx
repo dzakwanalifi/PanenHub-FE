@@ -58,13 +58,9 @@ export default function Header() {
             </div>
             <Link href="/cart" className="relative p-2 text-gray-600 hover:text-[#2E7D32] transition-colors">
               <ShoppingCart className="w-6 h-6" />
-              <ClientOnly>
-                {itemCount > 0 && (
-                  <span className="absolute -top-1 -right-1 bg-[#2E7D32] text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
-                    {itemCount}
-                  </span>
-                )}
-              </ClientOnly>
+              <span className={`absolute -top-1 -right-1 bg-[#2E7D32] text-white text-xs rounded-full w-5 h-5 flex items-center justify-center ${itemCount > 0 ? '' : 'hidden'}`}>
+                {itemCount}
+              </span>
             </Link>
             <Link href="/login" className="bg-[#2E7D32] text-white px-4 py-2 rounded-lg hover:bg-[#1B5E20] transition-colors">
               Login / Sign Up
@@ -87,13 +83,9 @@ export default function Header() {
             </button>
             <Link href="/cart" className="relative p-2 text-gray-600">
               <ShoppingCart className="w-6 h-6" />
-              <ClientOnly>
-                {itemCount > 0 && (
-                  <span className="absolute -top-1 -right-1 bg-[#2E7D32] text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
-                    {itemCount}
-                  </span>
-                )}
-              </ClientOnly>
+              <span className={`absolute -top-1 -right-1 bg-[#2E7D32] text-white text-xs rounded-full w-5 h-5 flex items-center justify-center ${itemCount > 0 ? '' : 'hidden'}`}>
+                {itemCount}
+              </span>
             </Link>
             <button
               onClick={() => setIsMenuOpen(!isMenuOpen)}
