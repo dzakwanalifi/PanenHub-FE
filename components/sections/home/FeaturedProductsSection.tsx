@@ -1,5 +1,7 @@
 'use client';
+import { useState, useEffect } from 'react';
 import ProductCard from '@/components/ui/ProductCard';
+import { ProductCardSkeleton } from '@/components/ui/Skeleton';
 import { mockProducts } from '@/lib/mock-data';
 
 interface FeaturedProductsSectionProps {
@@ -8,6 +10,17 @@ interface FeaturedProductsSectionProps {
 }
 
 export default function FeaturedProductsSection({ selectedCategory, searchTerm }: FeaturedProductsSectionProps) {
+  const [isLoading, setIsLoading] = useState(true);
+
+  // Simulate loading state
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setIsLoading(false);
+    }, 1500);
+
+    return () => clearTimeout(timer);
+  }, []);
+
   // Filter products based on category and search term
   const filteredProducts = mockProducts.filter(product => {
     // Filter by category
@@ -37,20 +50,28 @@ export default function FeaturedProductsSection({ selectedCategory, searchTerm }
           <p className="text-gray-500">No products found matching your criteria.</p>
         </div>
       ) : (
-      <div className="space-y-4">
-        {filteredProducts.map((product) => (
-          <ProductCard 
-            key={product.id} 
-            id={product.id}
-            name={product.name}
-            price={product.price}
-            image={product.images[0]}
-            rating={product.rating}
-            store={mockProducts.find(p => p.storeId === product.storeId)?.name || 'Unknown Store'}
-            discount={product.discount}
-          />
-        ))}
-      </div>
+        <div className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
+          {isLoading ? (
+            // Show skeleton loading state
+            Array.from({ length: 8 }).map((_, index) => (
+              <ProductCardSkeleton key={index} />
+            ))
+          ) : (
+            // Show actual products
+            filteredProducts.map((product) => (
+              <ProductCard 
+                key={product.id} 
+                id={product.id}
+                name={product.name}
+                price={product.price}
+                image={product.images[0]}
+                rating={product.rating}
+                store={mockProducts.find(p => p.storeId === product.storeId)?.name || 'Unknown Store'}
+                discount={product.discount}
+              />
+            ))
+          )}
+        </div>
       )}
     </section>
   );

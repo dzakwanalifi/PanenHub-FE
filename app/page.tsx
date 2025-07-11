@@ -2,6 +2,7 @@
 import { useState } from 'react';
 import ClientOnly from '@/components/ClientOnly';
 import HeroSection from '@/components/sections/home/HeroSection';
+import DeliveryModeSelector from '@/components/sections/home/DeliveryModeSelector';
 import CategoriesSection from '@/components/sections/home/CategoriesSection';
 import FeaturedProductsSection from '@/components/sections/home/FeaturedProductsSection';
 import SearchBar from '@/components/ui/SearchBar';
@@ -14,6 +15,8 @@ export default function Home() {
     <ClientOnly>
       <div className="space-y-8">
         <HeroSection />
+        
+        <DeliveryModeSelector />
         
         {/* Search Bar */}
         <div className="px-4">

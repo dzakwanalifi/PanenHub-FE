@@ -1,75 +1,39 @@
 'use client';
-import { MapPin, Truck } from 'lucide-react';
+import { ArrowRight } from 'lucide-react';
 import Link from 'next/link';
-import { useState } from 'react';
-import { useDeliveryStore } from '@/store/deliveryStore';
-import { useLocationStore } from '@/store/locationStore';
-import LocationSelectorModal from '@/components/ui/LocationSelectorModal';
 
 export default function HeroSection() {
-  const { deliveryMode, setDeliveryMode } = useDeliveryStore();
-  const { currentLocation } = useLocationStore();
-  const [isLocationModalOpen, setIsLocationModalOpen] = useState(false);
 
   return (
-    <section className="bg-white px-4 py-6">
-      {/* Header with Location and Actions */}
-      <div className="flex items-center justify-between mb-6">
-        <button 
-          onClick={() => setIsLocationModalOpen(true)}
-          aria-label="Change delivery location"
-          className="flex items-center space-x-2 hover:bg-[#F3F4F6] p-2 rounded-lg transition-colors"
-        >
-          <MapPin className="w-5 h-5 text-[#1F2937]" />
-          <div>
-            <p className="text-sm text-gray-500">Delivery location</p>
-            <p className="font-semibold text-[#1F2937]">{currentLocation.name}</p>
-          </div>
-        </button>
+    <section className="relative h-96 md:h-[500px] overflow-hidden">
+      {/* Background Image with Overlay */}
+      <div className="absolute inset-0">
+        <img
+          src="https://images.unsplash.com/photo-1542838132-92c53300491e?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80"
+          alt="Fresh produce background"
+          className="w-full h-full object-cover"
+        />
+        <div className="absolute inset-0 bg-black bg-opacity-40"></div>
       </div>
 
-      {/* Delivery/Pickup Toggle */}
-      <div className="mb-8">
-        <div className="bg-[#F3F4F6] rounded-full p-1 inline-flex">
-          <button
-            onClick={() => setDeliveryMode('delivery')}
-            aria-label="Select delivery mode"
-            className={`px-6 py-2 rounded-full text-sm font-medium transition-all ${
-              deliveryMode === 'delivery'
-                ? 'bg-white text-[#1F2937] shadow-sm'
-                : 'text-gray-500'
-            }`}
+      {/* Hero Content */}
+      <div className="relative z-10 flex items-center justify-center h-full px-4">
+        <div className="text-center text-white max-w-2xl">
+          <h1 className="text-4xl md:text-6xl font-bold mb-6 leading-tight">
+            Fresh Harvest, Delivered to Your Doorstep
+          </h1>
+          <p className="text-lg md:text-xl mb-8 text-gray-200">
+            Discover the finest organic produce from local farms, delivered fresh daily to your home.
+          </p>
+          <Link
+            href="/products"
+            className="inline-flex items-center bg-[#A5D6A7] text-[#1F2937] px-8 py-4 rounded-full text-lg font-semibold hover:bg-[#B9E4C9] transition-colors"
           >
-            <Truck className="w-4 h-4" />
-            <span>Delivery</span>
-          </button>
-          <button
-            onClick={() => setDeliveryMode('pickup')}
-            aria-label="Select pickup mode"
-            className={`px-6 py-2 rounded-full text-sm font-medium transition-all ${
-              deliveryMode === 'pickup'
-                ? 'bg-white text-[#1F2937] shadow-sm'
-                : 'text-gray-500'
-            }`}
-          >
-            <MapPin className="w-4 h-4" />
-            <span>Pickup</span>
-          </button>
+            Shop All Products
+            <ArrowRight className="w-5 h-5 ml-2" />
+          </Link>
         </div>
       </div>
-
-      {/* Debug: Current Mode Display */}
-      <div className="mb-4 p-3 bg-blue-50 rounded-lg">
-        <p className="text-sm text-blue-800">
-          Current Mode: <span className="font-semibold capitalize">{deliveryMode}</span>
-        </p>
-      </div>
-
-      {/* Location Selector Modal */}
-      <LocationSelectorModal 
-        isOpen={isLocationModalOpen}
-        onClose={() => setIsLocationModalOpen(false)}
-      />
     </section>
   );
 }
