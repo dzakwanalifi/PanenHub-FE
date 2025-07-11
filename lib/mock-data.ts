@@ -10,7 +10,7 @@ export interface MockProduct {
   reviewCount: number;
   category: string;
   inStock: boolean;
-  discount?: number;
+  originalPrice?: number;
 }
 
 export interface MockStore {
