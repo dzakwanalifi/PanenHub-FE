@@ -14,12 +14,12 @@ export default function FeaturedProductsSection({ selectedCategory, searchTerm }
   const [isLoading, setIsLoading] = useState(true);
   const [isFilterPanelOpen, setIsFilterPanelOpen] = useState(false);
   const [sortBy, setSortBy] = useState('popular');
-  const [filters, setFilters] = useState<FilterOptions>({
+  const [filters, setFilters] = useState<FilterOptions>(() => ({
     distance: 'any',
     category: 'all',
     priceRange: [0, 200],
     rating: 0,
-  });
+  }));
 
   // Simulate loading state
   useEffect(() => {
@@ -38,19 +38,27 @@ export default function FeaturedProductsSection({ selectedCategory, searchTerm }
         a = ((a << 5) - a) + b.charCodeAt(0);
         return a & a;
       }, 0);
+      const distance = parseFloat(((Math.abs(hash) % 45) / 10 + 0.5).toFixed(1));
       return {
         ...product,
-        distance: parseFloat(((Math.abs(hash) % 45) / 10 + 0.5).toFixed(1)),
+        distance,
       };
     }), []
   );
+
+  // Extract stable filter values
+  const filterDistance = filters.distance;
+  const filterCategory = filters.category;
+  const filterPriceMin = filters.priceRange[0];
+  const filterPriceMax = filters.priceRange[1];
+  const filterRating = filters.rating;
 
   // Memoize filtering and sorting to prevent infinite re-renders
   const sortedProducts = useMemo(() => {
     // Filter products based on all criteria
     const filteredProducts = productsWithDistance.filter(product => {
       // Filter by category (use both selectedCategory and filter category)
-      const selectedCat = selectedCategory === 'all' ? filters.category : selectedCategory;
+      const selectedCat = selectedCategory === 'all' ? filterCategory : selectedCategory;
       const categoryMatch = selectedCat === 'all' || 
         product.category.toLowerCase() === selectedCat.toLowerCase();
       
@@ -59,16 +67,16 @@ export default function FeaturedProductsSection({ selectedCategory, searchTerm }
         product.name.toLowerCase().includes(searchTerm.toLowerCase());
 
       // Filter by distance
-      const distanceMatch = filters.distance === 'any' || 
-        (filters.distance === 'under1' && product.distance < 1) ||
-        (filters.distance === '1to3' && product.distance >= 1 && product.distance <= 3) ||
-        (filters.distance === '3to5' && product.distance >= 3 && product.distance <= 5);
+      const distanceMatch = filterDistance === 'any' || 
+        (filterDistance === 'under1' && product.distance < 1) ||
+        (filterDistance === '1to3' && product.distance >= 1 && product.distance <= 3) ||
+        (filterDistance === '3to5' && product.distance >= 3 && product.distance <= 5);
 
       // Filter by price range
-      const priceMatch = product.price >= filters.priceRange[0] && product.price <= filters.priceRange[1];
+      const priceMatch = product.price >= filterPriceMin && product.price <= filterPriceMax;
 
       // Filter by rating
-      const ratingMatch = filters.rating === 0 || product.rating >= filters.rating;
+      const ratingMatch = filterRating === 0 || product.rating >= filterRating;
       
       return categoryMatch && searchMatch && distanceMatch && priceMatch && ratingMatch;
     });
@@ -91,7 +99,7 @@ export default function FeaturedProductsSection({ selectedCategory, searchTerm }
           return b.reviewCount - a.reviewCount;
       }
     });
-  }, [productsWithDistance, selectedCategory, searchTerm, filters, sortBy]);
+  }, [productsWithDistance, selectedCategory, searchTerm, filterDistance, filterCategory, filterPriceMin, filterPriceMax, filterRating, sortBy]);
 
   const handleApplyFilters = (newFilters: FilterOptions) => {
     setFilters(newFilters);
