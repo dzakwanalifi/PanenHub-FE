@@ -14,7 +14,6 @@ export default function Header() {
   const [isNotificationOpen, setIsNotificationOpen] = useState(false);
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
   const [hasMounted, setHasMounted] = useState(false);
-  const [headerSearchTerm, setHeaderSearchTerm] = useState('');
   const itemCount = useCartStore((state) => state.getItemCount());
   const { isLoggedIn, user, logout } = useAuthStore();
 
@@ -40,9 +39,7 @@ export default function Header() {
           </Link>
 
           {/* Desktop Search Bar */}
-          <div className="hidden md:flex flex-1 max-w-lg mx-8">
-            <SearchBar searchTerm={headerSearchTerm} onSearchChange={setHeaderSearchTerm} />
-          </div>
+          <div className="hidden md:flex flex-1 max-w-lg mx-8"></div>
 
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center space-x-4">
@@ -150,10 +147,6 @@ export default function Header() {
           </div>
         </div>
 
-        {/* Mobile Search Bar */}
-        <div className="md:hidden pb-4">
-          <SearchBar searchTerm={headerSearchTerm} onSearchChange={setHeaderSearchTerm} />
-        </div>
       </div>
 
       {/* Mobile Menu */}
