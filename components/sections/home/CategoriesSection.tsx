@@ -1,33 +1,30 @@
 'use client';
-import { Carrot, Apple, Wheat, Milk, Fish, Beef } from 'lucide-react';
+import { Utensils, Apple, Wheat, Milk, Fish, Beef } from 'lucide-react';
 
 const categories = [
-  { id: 'vegetables', name: 'Vegetables', icon: Carrot, color: 'bg-green-100 text-green-600' },
-  { id: 'fruits', name: 'Fruits', icon: Apple, color: 'bg-red-100 text-red-600' },
-  { id: 'grains', name: 'Grains', icon: Wheat, color: 'bg-yellow-100 text-yellow-600' },
-  { id: 'dairy', name: 'Dairy', icon: Milk, color: 'bg-blue-100 text-blue-600' },
-  { id: 'seafood', name: 'Seafood', icon: Fish, color: 'bg-cyan-100 text-cyan-600' },
-  { id: 'meat', name: 'Meat', icon: Beef, color: 'bg-pink-100 text-pink-600' },
+  { id: 'meats', name: 'Meats', icon: Utensils },
+  { id: 'fresh', name: 'Fresh', icon: Apple },
+  { id: 'bakery', name: 'Bakery', icon: Wheat },
+  { id: 'grains', name: 'Grains', icon: Milk },
+  { id: 'organic', name: 'Organic', icon: Fish },
 ];
 
 export default function CategoriesSection() {
   return (
-    <section className="container mx-auto px-4">
-      <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mb-6">Shop by Category</h2>
-      
-      <div className="overflow-x-auto">
-        <div className="flex space-x-4 pb-4">
+    <section className="px-4 mb-8">
+      <div className="flex justify-between items-center overflow-x-auto">
+        <div className="flex space-x-6">
           {categories.map((category) => (
-            <button
+            <div
               key={category.id}
+              className="flex flex-col items-center space-y-2 cursor-pointer"
               onClick={() => console.log('Category clicked:', category.name)}
-              className="flex-shrink-0 bg-white rounded-2xl p-6 shadow-lg hover:shadow-xl transition-shadow min-w-[120px]"
             >
-              <div className={`w-16 h-16 rounded-xl ${category.color} flex items-center justify-center mx-auto mb-3`}>
-                <category.icon className="w-8 h-8" />
+              <div className="w-12 h-12 bg-light rounded-full flex items-center justify-center">
+                <category.icon className="w-6 h-6 text-dark" />
               </div>
-              <h3 className="text-sm font-semibold text-gray-900 text-center">{category.name}</h3>
-            </button>
+              <span className="text-sm font-medium text-dark">{category.name}</span>
+            </div>
           ))}
         </div>
       </div>

@@ -38,7 +38,7 @@ export default function ProductCard({
 
   return (
     <Link href={`/products/${id}`}>
-      <div className="bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow cursor-pointer">
+      <div className="card-flat overflow-hidden hover:border-gray-300 transition-colors cursor-pointer">
         <div className="relative">
           <img
             src={image}
@@ -52,18 +52,18 @@ export default function ProductCard({
           )}
           <button
             onClick={handleAddToCart}
-            className="absolute top-3 right-3 w-10 h-10 bg-white rounded-full shadow-lg flex items-center justify-center hover:bg-gray-50 transition-colors"
+            className="absolute top-3 right-3 w-10 h-10 bg-white rounded-full border border-gray-200 flex items-center justify-center hover:bg-gray-50 transition-colors"
           >
             <ShoppingCart className="w-5 h-5 text-gray-600" />
           </button>
         </div>
 
         <div className="p-4">
-          <h3 className="text-lg font-semibold text-gray-900 mb-2 line-clamp-2">
+          <h3 className="text-lg font-semibold text-dark mb-2 line-clamp-2">
             {name}
           </h3>
           
-          <span className="text-sm text-[#2E7D32] font-medium mb-2 block">
+          <span className="text-sm text-[#A5D6A7] font-medium mb-2 block">
             {store}
           </span>
 
@@ -85,7 +85,7 @@ export default function ProductCard({
 
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-2">
-              <span className="text-xl font-bold text-[#2E7D32]">
+              <span className="text-xl font-bold text-[#A5D6A7]">
                 ${price.toFixed(2)}
               </span>
               {discount && (

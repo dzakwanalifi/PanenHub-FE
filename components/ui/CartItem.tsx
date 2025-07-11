@@ -10,8 +10,8 @@ interface CartItemProps {
 export default function CartItem({ item }: CartItemProps) {
   const { updateQuantity, removeItem } = useCartStore();
 
-  const handleQuantityChange = (quantity: number) => {
-    updateQuantity(item.id, quantity);
+  const handleQuantityChange = (newQuantity: number) => {
+    updateQuantity(item.id, newQuantity);
   };
 
   const handleRemove = () => {
@@ -19,7 +19,7 @@ export default function CartItem({ item }: CartItemProps) {
   };
 
   return (
-    <div className="bg-white rounded-2xl p-4 shadow-sm">
+    <div className="card-flat p-4">
       <div className="flex items-center space-x-4">
         <img
           src={item.image}
@@ -28,36 +28,26 @@ export default function CartItem({ item }: CartItemProps) {
         />
         
         <div className="flex-1">
-          <h3 className="font-semibold text-gray-900">{item.name}</h3>
-          <p className="text-sm text-gray-500">{item.store}</p>
-          <p className="text-lg font-bold text-[#2E7D32]">
-            ${item.price.toFixed(2)} /kg
-          </p>
+          <h3 className="font-semibold text-dark mb-1">{item.name}</h3>
+          <p className="text-sm text-gray-600 mb-2">{item.store}</p>
+          <div className="flex items-center justify-between">
+            <span className="text-lg font-bold text-[#A5D6A7]">
+              ${item.price.toFixed(2)}
+            </span>
+            <QuantityStepper
+              quantity={item.quantity}
+              onQuantityChange={handleQuantityChange}
+              size="sm"
+            />
+          </div>
         </div>
-        
-        <div className="flex flex-col items-end space-y-2">
-          <button
-            onClick={handleRemove}
-            className="text-red-500 hover:text-red-700 p-1"
-          >
-            <Trash2 className="w-4 h-4" />
-          </button>
-          
-          <QuantityStepper
-            quantity={item.quantity}
-            onQuantityChange={handleQuantityChange}
-            min={1}
-          />
-        </div>
-      </div>
-      
-      <div className="mt-4 pt-4 border-t border-gray-200">
-        <div className="flex justify-between items-center">
-          <span className="text-gray-600">Subtotal:</span>
-          <span className="font-bold text-lg text-[#2E7D32]">
-            ${(item.price * item.quantity).toFixed(2)}
-          </span>
-        </div>
+
+        <button
+          onClick={handleRemove}
+          className="p-2 text-red-500 hover:bg-red-50 rounded-lg transition-colors"
+        >
+          <Trash2 className="w-5 h-5" />
+        </button>
       </div>
     </div>
   );

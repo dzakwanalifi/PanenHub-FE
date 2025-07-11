@@ -6,9 +6,16 @@ interface QuantityStepperProps {
   onQuantityChange: (quantity: number) => void;
   min?: number;
   max?: number;
+  size?: 'sm' | 'md' | 'lg';
 }
 
-export default function QuantityStepper({ quantity, onQuantityChange, min = 0, max = 99 }: QuantityStepperProps) {
+export default function QuantityStepper({
+  quantity,
+  onQuantityChange,
+  min = 1,
+  max = 99,
+  size = 'md',
+}: QuantityStepperProps) {
   const handleDecrease = () => {
     if (quantity > min) {
       onQuantityChange(quantity - 1);
@@ -21,22 +28,42 @@ export default function QuantityStepper({ quantity, onQuantityChange, min = 0, m
     }
   };
 
+  const sizeClasses = {
+    sm: 'h-8 px-3',
+    md: 'h-10 px-4',
+    lg: 'h-12 px-5',
+  };
+
+  const buttonSizeClasses = {
+    sm: 'w-6 h-6',
+    md: 'w-8 h-8',
+    lg: 'w-10 h-10',
+  };
+
+  const textSizeClasses = {
+    sm: 'text-sm',
+    md: 'text-base',
+    lg: 'text-lg',
+  };
+
   return (
-    <div className="flex items-center space-x-3">
+    <div className={`flex items-center bg-light rounded-full ${sizeClasses[size]}`}>
       <button
         onClick={handleDecrease}
         disabled={quantity <= min}
-        className="w-8 h-8 rounded-full border border-gray-300 flex items-center justify-center hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed"
+        className={`${buttonSizeClasses[size]} rounded-full bg-white border border-gray-200 flex items-center justify-center text-gray-600 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors`}
       >
         <Minus className="w-4 h-4" />
       </button>
       
-      <span className="text-lg font-semibold w-8 text-center">{quantity}</span>
+      <span className={`flex-1 text-center font-semibold text-dark ${textSizeClasses[size]}`}>
+        {quantity}
+      </span>
       
       <button
         onClick={handleIncrease}
         disabled={quantity >= max}
-        className="w-8 h-8 rounded-full bg-[#2E7D32] text-white flex items-center justify-center hover:bg-[#1B5E20] disabled:opacity-50 disabled:cursor-not-allowed"
+        className={`${buttonSizeClasses[size]} rounded-full bg-white border border-gray-200 flex items-center justify-center text-gray-600 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors`}
       >
         <Plus className="w-4 h-4" />
       </button>

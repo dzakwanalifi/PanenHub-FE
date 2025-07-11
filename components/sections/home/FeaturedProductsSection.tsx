@@ -73,15 +73,15 @@ const featuredProducts = [
 
 export default function FeaturedProductsSection() {
   return (
-    <section className="container mx-auto px-4">
+    <section className="px-4">
       <div className="flex items-center justify-between mb-6">
-        <h2 className="text-2xl md:text-3xl font-bold text-gray-900">Featured Products</h2>
-        <button className="text-[#2E7D32] font-semibold hover:underline">
+        <h2 className="text-xl font-bold text-dark">Popular items</h2>
+        <button className="text-[#A5D6A7] font-semibold hover:underline">
           View All
         </button>
       </div>
       
-      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
+      <div className="space-y-4">
         {featuredProducts.map((product) => (
           <ProductCard key={product.id} {...product} />
         ))}
