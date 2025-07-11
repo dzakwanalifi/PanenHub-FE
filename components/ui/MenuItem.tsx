@@ -1,6 +1,6 @@
 'use client';
 import Link from 'next/link';
-import { LucideIcon } from 'lucide-react';
+import { DivideIcon as LucideIcon } from 'lucide-react';
 
 interface MenuItemProps {
   icon: LucideIcon;
