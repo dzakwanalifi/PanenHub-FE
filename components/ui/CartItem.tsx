@@ -1,9 +1,7 @@
 'use client';
-import { Trash2 } from 'lucide-react';
-import Image from 'next/image';
-import { formatPrice } from '@/lib/constants';
+import { Minus, Plus, Trash2 } from 'lucide-react';
 import { useCartStore, CartItem as CartItemType } from '@/store/cartStore';
-import QuantityStepper from './QuantityStepper';
+import { formatPrice } from '@/lib/constants';
 
 interface CartItemProps {
   item: CartItemType;
@@ -13,53 +11,66 @@ export default function CartItem({ item }: CartItemProps) {
   const { updateQuantity, removeItem } = useCartStore();
 
   const handleQuantityChange = (newQuantity: number) => {
-    updateQuantity(item.id, newQuantity);
-  };
-
-  const handleRemove = () => {
-    removeItem(item.id);
+    if (newQuantity <= 0) {
+      removeItem(item.id);
+    } else {
+      updateQuantity(item.id, newQuantity);
+    }
   };
 
   return (
-    <div className="bg-white border border-gray-200 rounded-2xl p-4 mb-4">
-      <div className="flex items-center space-x-4">
-        <div className="relative w-16 h-16 rounded-lg overflow-hidden">
-          <Image
-            src={item.image}
-            alt={item.name}
-            fill
-            className="object-cover"
-            sizes="64px"
-          />
-        </div>
-        
-        <div className="flex-1">
-          <h3 className="font-semibold text-[#1F2937] mb-1">{item.name}</h3>
-          <p className="text-sm text-gray-500 mb-2">{item.store}</p>
-          <div className="flex items-center justify-between">
-            <span className="text-lg font-bold text-[#1F2937]">
-              ${item.price.toFixed(2)}
-            </span>
-              <p className="text-lg font-bold text-[#2E7D32]">{formatPrice(item.price)}</p>
-              <QuantityStepper
-                quantity={item.quantity}
-                onQuantityChange={handleQuantityChange}
-                min={1}
-                size="sm"
-              />
-              <button
-                onClick={handleRemove}
-                aria-label={`Remove ${item.name} from cart`}
-                className="p-2 text-red-500 hover:bg-red-50 rounded-lg transition-colors"
-              >
-                <Trash2 className="w-4 h-4" />
-              </button>
-            </div>
-          </div>
-        </div>
+    <div className="bg-white rounded-2xl shadow-lg p-4 flex items-center space-x-4">
+      <img
+        src={item.image}
+        alt={item.name}
+        className="w-20 h-20 object-cover rounded-lg"
+      />
+      
+      <div className="flex-1">
+        <h3 className="font-semibold text-gray-900">{item.name}</h3>
+        <p className="text-sm text-gray-600">{item.store}</p>
+        <p className="text-lg font-bold text-[#2E7D32] mt-1">{formatPrice(item.price)}</p>
       </div>
-      <div className="flex items-center">
-            <span className="text-lg font-bold text-gray-900">{formatPrice(item.price * item.quantity)}</span>
+
+      <div className="flex items-center space-x-3">
+        {/* Quantity Controls */}
+        <div className="flex items-center space-x-2">
+          <button
+            onClick={() => handleQuantityChange(item.quantity - 1)}
+            className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center hover:bg-gray-200 transition-colors"
+            aria-label="Decrease quantity"
+          >
+            <Minus className="w-4 h-4 text-gray-600" />
+          </button>
+          
+          <span className="w-8 text-center font-medium text-gray-900">
+            {item.quantity}
+          </span>
+          
+          <button
+            onClick={() => handleQuantityChange(item.quantity + 1)}
+            className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center hover:bg-gray-200 transition-colors"
+            aria-label="Increase quantity"
+          >
+            <Plus className="w-4 h-4 text-gray-600" />
+          </button>
+        </div>
+
+        {/* Total Price */}
+        <div className="text-right min-w-[80px]">
+          <span className="text-lg font-bold text-gray-900">
+            {formatPrice(item.price * item.quantity)}
+          </span>
+        </div>
+
+        {/* Remove Button */}
+        <button
+          onClick={() => removeItem(item.id)}
+          className="p-2 text-red-500 hover:bg-red-50 rounded-lg transition-colors"
+          aria-label="Remove item"
+        >
+          <Trash2 className="w-5 h-5" />
+        </button>
       </div>
     </div>
   );
