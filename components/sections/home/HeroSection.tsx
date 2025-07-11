@@ -1,22 +1,30 @@
 'use client';
-import { MapPin, Search, Bell } from 'lucide-react';
+import { MapPin, Search, Bell, Truck } from 'lucide-react';
 import Link from 'next/link';
 import { useState } from 'react';
+import { useDeliveryStore } from '@/store/deliveryStore';
+import { useLocationStore } from '@/store/locationStore';
+import LocationSelectorModal from '@/components/ui/LocationSelectorModal';
 
 export default function HeroSection() {
-  const [deliveryMode, setDeliveryMode] = useState<'delivery' | 'pickup'>('delivery');
+  const { deliveryMode, setDeliveryMode } = useDeliveryStore();
+  const { currentLocation } = useLocationStore();
+  const [isLocationModalOpen, setIsLocationModalOpen] = useState(false);
 
   return (
     <section className="bg-white px-4 py-6">
       {/* Header with Location and Actions */}
       <div className="flex items-center justify-between mb-6">
-        <div className="flex items-center space-x-2">
+        <button 
+          onClick={() => setIsLocationModalOpen(true)}
+          className="flex items-center space-x-2 hover:bg-[#F3F4F6] p-2 rounded-lg transition-colors"
+        >
           <MapPin className="w-5 h-5 text-[#1F2937]" />
           <div>
             <p className="text-sm text-gray-500">Delivery location</p>
-            <p className="font-semibold text-[#1F2937]">Green Valley Point</p>
+            <p className="font-semibold text-[#1F2937]">{currentLocation.name}</p>
           </div>
-        </div>
+        </button>
         <div className="flex items-center space-x-3">
           <button className="p-2 text-[#1F2937] hover:text-[#A5D6A7] transition-colors">
             <Search className="w-6 h-6" />
@@ -38,7 +46,8 @@ export default function HeroSection() {
                 : 'text-gray-500'
             }`}
           >
-            🚚 Delivery
+            <Truck className="w-4 h-4" />
+            <span>Delivery</span>
           </button>
           <button
             onClick={() => setDeliveryMode('pickup')}
@@ -48,10 +57,24 @@ export default function HeroSection() {
                 : 'text-gray-500'
             }`}
           >
-            🏪 Pickup
+            <MapPin className="w-4 h-4" />
+            <span>Pickup</span>
           </button>
         </div>
       </div>
+
+      {/* Debug: Current Mode Display */}
+      <div className="mb-4 p-3 bg-blue-50 rounded-lg">
+        <p className="text-sm text-blue-800">
+          Current Mode: <span className="font-semibold capitalize">{deliveryMode}</span>
+        </p>
+      </div>
+
+      {/* Location Selector Modal */}
+      <LocationSelectorModal 
+        isOpen={isLocationModalOpen}
+        onClose={() => setIsLocationModalOpen(false)}
+      />
     </section>
   );
 }

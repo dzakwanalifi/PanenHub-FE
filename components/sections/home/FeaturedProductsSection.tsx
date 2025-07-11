@@ -1,77 +1,28 @@
 'use client';
 import ProductCard from '@/components/ui/ProductCard';
+import { mockProducts } from '@/lib/mock-data';
 
-const featuredProducts = [
-  {
-    id: '1',
-    name: 'Organic Carrots',
-    price: 2.99,
-    image: 'https://images.unsplash.com/photo-1445282768818-728615cc910a?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
-    rating: 4.5,
-    store: 'Green Valley Farms',
-    discount: 10,
-  },
-  {
-    id: '2',
-    name: 'Fresh Spinach',
-    price: 3.49,
-    image: 'https://images.unsplash.com/photo-1576045057995-568f588f82fb?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
-    rating: 4.8,
-    store: 'Sunrise Organic',
-  },
-  {
-    id: '3',
-    name: 'Red Tomatoes',
-    price: 4.99,
-    image: 'https://images.unsplash.com/photo-1546470427-e2e5c92b3c38?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
-    rating: 4.6,
-    store: 'Fresh Fields',
-    discount: 15,
-  },
-  {
-    id: '4',
-    name: 'Sweet Potatoes',
-    price: 3.99,
-    image: 'https://images.unsplash.com/photo-1519664398569-62bd70cf903e?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
-    rating: 4.7,
-    store: 'Organic Harvest',
-  },
-  {
-    id: '5',
-    name: 'Fresh Broccoli',
-    price: 5.49,
-    image: 'https://images.unsplash.com/photo-1459411621453-7b03977f4bfc?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
-    rating: 4.4,
-    store: 'Green Valley Farms',
-  },
-  {
-    id: '6',
-    name: 'Bell Peppers',
-    price: 6.99,
-    image: 'https://images.unsplash.com/photo-1563565375-f3fdfdbefa83?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
-    rating: 4.5,
-    store: 'Sunny Farms',
-    discount: 20,
-  },
-  {
-    id: '7',
-    name: 'Organic Lettuce',
-    price: 2.49,
-    image: 'https://images.unsplash.com/photo-1540420773420-3366772f4999?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
-    rating: 4.3,
-    store: 'Fresh Fields',
-  },
-  {
-    id: '8',
-    name: 'Baby Potatoes',
-    price: 3.29,
-    image: 'https://images.unsplash.com/photo-1518977676601-b53f82aba655?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
-    rating: 4.6,
-    store: 'Organic Harvest',
-  },
-];
+interface FeaturedProductsSectionProps {
+  selectedCategory: string;
+  searchTerm: string;
+}
 
-export default function FeaturedProductsSection() {
+export default function FeaturedProductsSection({ selectedCategory, searchTerm }: FeaturedProductsSectionProps) {
+  // Filter products based on category and search term
+  const filteredProducts = mockProducts.filter(product => {
+    // Filter by category
+    const categoryMatch = selectedCategory === 'all' || 
+      product.category.toLowerCase() === selectedCategory.toLowerCase() ||
+      (selectedCategory === 'fresh' && product.category === 'Vegetables') ||
+      (selectedCategory === 'fresh' && product.category === 'Fruits');
+    
+    // Filter by search term
+    const searchMatch = searchTerm === '' || 
+      product.name.toLowerCase().includes(searchTerm.toLowerCase());
+    
+    return categoryMatch && searchMatch;
+  });
+
   return (
     <section className="px-4">
       <div className="flex items-center justify-between mb-6">
@@ -81,11 +32,26 @@ export default function FeaturedProductsSection() {
         </button>
       </div>
       
+      {filteredProducts.length === 0 ? (
+        <div className="text-center py-8">
+          <p className="text-gray-500">No products found matching your criteria.</p>
+        </div>
+      ) : (
       <div className="space-y-4">
-        {featuredProducts.map((product) => (
-          <ProductCard key={product.id} {...product} />
+        {filteredProducts.map((product) => (
+          <ProductCard 
+            key={product.id} 
+            id={product.id}
+            name={product.name}
+            price={product.price}
+            image={product.images[0]}
+            rating={product.rating}
+            store={mockProducts.find(p => p.storeId === product.storeId)?.name || 'Unknown Store'}
+            discount={product.discount}
+          />
         ))}
       </div>
+      )}
     </section>
   );
 }

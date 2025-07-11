@@ -1,26 +1,27 @@
 'use client';
-import { useState } from 'react';
 import { Search } from 'lucide-react';
 
-export default function SearchBar() {
-  const [searchTerm, setSearchTerm] = useState('');
+interface SearchBarProps {
+  searchTerm: string;
+  onSearchChange: (term: string) => void;
+  placeholder?: string;
+}
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    console.log('Search term:', searchTerm);
-    // TODO: Implement search functionality
-  };
-
+export default function SearchBar({ 
+  searchTerm, 
+  onSearchChange, 
+  placeholder = "Search for products..." 
+}: SearchBarProps) {
   return (
-    <form onSubmit={handleSubmit} className="relative w-full">
+    <div className="relative w-full">
+      <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
       <input
         type="text"
         value={searchTerm}
-        onChange={(e) => setSearchTerm(e.target.value)}
-        placeholder="Search for fresh produce..."
-        className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#2E7D32] focus:border-transparent"
+        onChange={(e) => onSearchChange(e.target.value)}
+        placeholder={placeholder}
+        className="w-full pl-10 pr-4 py-3 bg-[#F3F4F6] border-0 rounded-full focus:ring-2 focus:ring-[#A5D6A7] focus:outline-none text-[#1F2937] placeholder-gray-500"
       />
-      <Search className="absolute left-3 top-2.5 w-5 h-5 text-gray-400" />
-    </form>
+    </div>
   );
 }
