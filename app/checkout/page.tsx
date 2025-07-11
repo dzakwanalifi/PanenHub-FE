@@ -4,18 +4,24 @@ import { useRouter } from 'next/navigation';
 import { ArrowLeft, CreditCard, MapPin, User, Check } from 'lucide-react';
 import { useCartStore } from '@/store/cartStore';
 import { useAuthStore } from '@/store/authStore';
+import { calculateServerSideTotal } from '@/lib/utils';
 import ProtectedRoute from '@/components/auth/ProtectedRoute';
 import Button from '@/components/ui/Button';
 import Input from '@/components/ui/Input';
 import Card from '@/components/ui/Card';
+import PaymentModal from '@/components/ui/PaymentModal';
 import Link from 'next/link';
 
 export default function CheckoutPage() {
   const [currentStep, setCurrentStep] = useState(1);
   const [loading, setLoading] = useState(false);
-  const { items, getTotal, clearCart } = useCartStore();
+  const [showPaymentModal, setShowPaymentModal] = useState(false);
+  const { items, clearCart } = useCartStore();
   const { user } = useAuthStore();
   const router = useRouter();
+  
+  // Use server-side calculation for authoritative pricing
+  const priceData = calculateServerSideTotal(items);
 
   // Form states
   const [shippingInfo, setShippingInfo] = useState({
@@ -29,13 +35,6 @@ export default function CheckoutPage() {
     country: 'United States'
   });
 
-  const [paymentInfo, setPaymentInfo] = useState({
-    cardNumber: '',
-    expiryDate: '',
-    cvv: '',
-    cardholderName: ''
-  });
-
   const steps = [
     { id: 1, title: 'Shipping', icon: MapPin },
     { id: 2, title: 'Payment', icon: CreditCard },
@@ -47,8 +46,11 @@ export default function CheckoutPage() {
     setCurrentStep(2);
   };
 
-  const handlePaymentSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
+  const handlePaymentSubmit = () => {
+    setShowPaymentModal(true);
+  };
+
+  const handlePaymentSuccess = () => {
     setCurrentStep(3);
   };
 
@@ -56,8 +58,8 @@ export default function CheckoutPage() {
     e.preventDefault();
     setLoading(true);
 
-    // Simulate payment processing
-    await new Promise(resolve => setTimeout(resolve, 2000));
+    // Simulate order processing
+    await new Promise(resolve => setTimeout(resolve, 1000));
 
     // Clear cart and redirect to success page
     clearCart();
@@ -153,43 +155,28 @@ export default function CheckoutPage() {
   const renderPaymentStep = () => (
     <Card>
       <h2 className="text-xl font-bold text-gray-900 mb-6">Payment Information</h2>
-      <form onSubmit={handlePaymentSubmit} className="space-y-4">
-        <Input
-          label="Cardholder Name"
-          value={paymentInfo.cardholderName}
-          onChange={(e) => setPaymentInfo({...paymentInfo, cardholderName: e.target.value})}
-          required
-        />
-        <Input
-          label="Card Number"
-          value={paymentInfo.cardNumber}
-          onChange={(e) => setPaymentInfo({...paymentInfo, cardNumber: e.target.value})}
-          placeholder="1234 5678 9012 3456"
-          required
-        />
-        <div className="grid grid-cols-2 gap-4">
-          <Input
-            label="Expiry Date"
-            value={paymentInfo.expiryDate}
-            onChange={(e) => setPaymentInfo({...paymentInfo, expiryDate: e.target.value})}
-            placeholder="MM/YY"
-            required
-          />
-          <Input
-            label="CVV"
-            value={paymentInfo.cvv}
-            onChange={(e) => setPaymentInfo({...paymentInfo, cvv: e.target.value})}
-            placeholder="123"
-            required
-          />
+      <div className="space-y-6">
+        <div className="bg-green-50 border border-green-200 rounded-lg p-6 text-center">
+          <CreditCard className="w-12 h-12 text-green-600 mx-auto mb-4" />
+          <h3 className="text-lg font-semibold text-gray-900 mb-2">Secure Payment Processing</h3>
+          <p className="text-gray-600 mb-4">
+            Your payment will be processed securely through our trusted payment partner. 
+            We use industry-standard encryption to protect your financial information.
+          </p>
+                     <p className="text-sm text-gray-500">
+             Total Amount: <span className="font-semibold text-gray-900">${priceData.finalTotal.toFixed(2)}</span>
+           </p>
         </div>
+
         <div className="flex justify-between">
           <Button variant="outline" onClick={() => setCurrentStep(1)}>
             Back to Shipping
           </Button>
-          <Button type="submit" size="lg">Review Order</Button>
+          <Button onClick={handlePaymentSubmit} size="lg">
+            Proceed to Secure Payment
+          </Button>
         </div>
-      </form>
+      </div>
     </Card>
   );
 
@@ -201,7 +188,7 @@ export default function CheckoutPage() {
         {/* Order Items */}
         <div className="space-y-4 mb-6">
           {items.map((item) => (
-            <div key={`${item.id}-${Math.random()}`} className="flex items-center space-x-4 p-4 bg-gray-50 rounded-lg">
+            <div key={item.cartItemId} className="flex items-center space-x-4 p-4 bg-gray-50 rounded-lg">
               <img src={item.image} alt={item.name} className="w-16 h-16 object-cover rounded-lg" />
               <div className="flex-1">
                 <h3 className="font-semibold text-gray-900">{item.name}</h3>
@@ -217,15 +204,21 @@ export default function CheckoutPage() {
         <div className="border-t pt-4">
           <div className="flex justify-between items-center mb-2">
             <span className="text-gray-600">Subtotal</span>
-            <span className="font-semibold">${getTotal().toFixed(2)}</span>
+            <span className="font-semibold">${priceData.subtotal.toFixed(2)}</span>
           </div>
           <div className="flex justify-between items-center mb-2">
             <span className="text-gray-600">Shipping</span>
-            <span className="font-semibold">$5.99</span>
+            <span className="font-semibold">
+              {priceData.shipping === 0 ? 'Free' : `$${priceData.shipping.toFixed(2)}`}
+            </span>
+          </div>
+          <div className="flex justify-between items-center mb-2">
+            <span className="text-gray-600">Discount</span>
+            <span className="font-semibold text-green-600">-${priceData.discount.toFixed(2)}</span>
           </div>
           <div className="flex justify-between items-center mb-4 text-lg font-bold">
             <span>Total</span>
-            <span>${(getTotal() + 5.99).toFixed(2)}</span>
+            <span>${priceData.finalTotal.toFixed(2)}</span>
           </div>
         </div>
 
@@ -274,6 +267,13 @@ export default function CheckoutPage() {
           {currentStep === 2 && renderPaymentStep()}
           {currentStep === 3 && renderReviewStep()}
         </div>
+
+        <PaymentModal
+          isOpen={showPaymentModal}
+          onClose={() => setShowPaymentModal(false)}
+          onSuccess={handlePaymentSuccess}
+          total={priceData.finalTotal}
+        />
       </div>
     </ProtectedRoute>
   );

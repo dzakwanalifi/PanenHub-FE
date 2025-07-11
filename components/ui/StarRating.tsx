@@ -17,7 +17,7 @@ export default function StarRating({ rating, size = 'md', showRating = false }: 
     const stars = [];
     
     for (let i = 0; i < 5; i++) {
-      if (i <= Math.floor(rating)) {
+      if (i < Math.floor(rating)) {
         // Full star
         stars.push(
           <Star
@@ -25,7 +25,7 @@ export default function StarRating({ rating, size = 'md', showRating = false }: 
             className={`${sizeClasses[size]} text-yellow-400 fill-current`}
           />
         );
-      } else if (i === Math.ceil(rating) && rating % 1 !== 0) {
+      } else if (i === Math.floor(rating) && rating % 1 !== 0) {
         // Half star
         const percentage = ((rating % 1) * 100);
         stars.push(

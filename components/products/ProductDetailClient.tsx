@@ -14,6 +14,7 @@ interface ProductDetailClientProps {
 export default function ProductDetailClient({ product }: ProductDetailClientProps) {
   const [quantity, setQuantity] = useState(1);
   const [isFavorite, setIsFavorite] = useState(false);
+  const [selectedImageIndex, setSelectedImageIndex] = useState(0);
   const addItem = useCartStore((state) => state.addItem);
 
   const handleAddToCart = () => {
@@ -35,17 +36,43 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
       <h1 className="text-2xl md:text-3xl font-bold text-[#1F2937] mb-8 text-center">Product Details</h1>
       
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        {/* Product Image */}
+        {/* Product Image Gallery */}
         <div className="space-y-4">
+          {/* Main Image */}
           <div className="aspect-square rounded-2xl overflow-hidden relative">
             <Image
-              src={product.image}
+              src={product.images[selectedImageIndex]}
               alt={product.name}
               fill
               className="object-cover"
               sizes="(max-width: 768px) 100vw, 50vw"
             />
           </div>
+          
+          {/* Thumbnail Images */}
+          {product.images.length > 1 && (
+            <div className="flex space-x-2 overflow-x-auto">
+              {product.images.map((image, index) => (
+                <button
+                  key={index}
+                  onClick={() => setSelectedImageIndex(index)}
+                  className={`flex-shrink-0 w-20 h-20 rounded-lg overflow-hidden border-2 transition-colors ${
+                    selectedImageIndex === index
+                      ? 'border-[#2E7D32]'
+                      : 'border-gray-200 hover:border-gray-300'
+                  }`}
+                >
+                  <Image
+                    src={image}
+                    alt={`${product.name} view ${index + 1}`}
+                    width={80}
+                    height={80}
+                    className="object-cover w-full h-full"
+                  />
+                </button>
+              ))}
+            </div>
+          )}
         </div>
 
         {/* Product Info */}

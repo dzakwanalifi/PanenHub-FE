@@ -12,9 +12,9 @@ export default function CartItem({ item }: CartItemProps) {
 
   const handleQuantityChange = (newQuantity: number) => {
     if (newQuantity <= 0) {
-      removeItem(item.id);
+      removeItem(item.cartItemId);
     } else {
-      updateQuantity(item.id, newQuantity);
+      updateQuantity(item.cartItemId, newQuantity);
     }
   };
 
@@ -65,7 +65,7 @@ export default function CartItem({ item }: CartItemProps) {
 
         {/* Remove Button */}
         <button
-          onClick={() => removeItem(item.id)}
+          onClick={() => removeItem(item.cartItemId)}
           className="p-2 text-red-500 hover:bg-red-50 rounded-lg transition-colors"
           aria-label="Remove item"
         >
