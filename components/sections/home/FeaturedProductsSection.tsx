@@ -2,7 +2,7 @@
 import { useState, useEffect } from 'react';
 import ProductCard from '@/components/ui/ProductCard';
 import { ProductCardSkeleton } from '@/components/ui/Skeleton';
-import { mockProducts } from '@/lib/mock-data';
+import { mockProducts, mockStores } from '@/lib/mock-data';
 
 interface FeaturedProductsSectionProps {
   selectedCategory: string;
