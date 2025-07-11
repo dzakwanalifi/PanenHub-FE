@@ -13,8 +13,10 @@ interface ProductCardProps {
   price: number;
   originalPrice?: number;
   originalPrice?: number;
+  originalPrice?: number;
   image: string;
   store: string;
+}
 }
 
 export default function ProductCard({ id, name, price, originalPrice, image, rating, store }: ProductCardProps) {
