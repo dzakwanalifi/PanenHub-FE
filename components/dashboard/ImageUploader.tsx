@@ -5,10 +5,11 @@ import { Upload, X, Image as ImageIcon } from 'lucide-react';
 interface ImageUploaderProps {
   images: string[];
   onImagesChange: (images: string[]) => void;
+  isAnalyzing?: boolean;
   maxImages?: number;
 }
 
-export default function ImageUploader({ images, onImagesChange, maxImages = 5 }: ImageUploaderProps) {
+export default function ImageUploader({ images, onImagesChange, isAnalyzing = false, maxImages = 5 }: ImageUploaderProps) {
   const [isDragging, setIsDragging] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -115,9 +116,22 @@ export default function ImageUploader({ images, onImagesChange, maxImages = 5 }:
                 alt={`Product image ${index + 1}`}
                 className="w-full h-32 object-cover rounded-lg border border-gray-200"
               />
+              
+              {/* AI Analyzing Overlay */}
+              {isAnalyzing && index === 0 && (
+                <div className="absolute inset-0 bg-black bg-opacity-50 rounded-lg flex items-center justify-center">
+                  <div className="text-center text-white">
+                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-white mx-auto mb-2"></div>
+                    <p className="text-sm font-medium">Analyzing with AI...</p>
+                  </div>
+                </div>
+              )}
+              
               <button
                 onClick={() => removeImage(index)}
-                className="absolute top-2 right-2 w-6 h-6 bg-red-500 text-white rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+                className={`absolute top-2 right-2 w-6 h-6 bg-red-500 text-white rounded-full flex items-center justify-center transition-opacity ${
+                  isAnalyzing && index === 0 ? 'opacity-0' : 'opacity-0 group-hover:opacity-100'
+                }`}
               >
                 <X className="w-4 h-4" />
               </button>

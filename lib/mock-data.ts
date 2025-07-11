@@ -516,3 +516,46 @@ export const getOrdersByUserId = (userId: string): MockOrder[] => {
 export const getConversationsByUserId = (userId: string): MockConversation[] => {
   return mockConversations.filter(conv => conv.participants.includes(userId));
 };
+
+// AI Mock Response Function
+export interface AIProductResponse {
+  productName: string;
+  description: string;
+  suggestedPrice: number;
+  suggestedCategory: string;
+}
+
+export const getMockAIResponse = (imageUrl: string): AIProductResponse => {
+  // In a real implementation, this would analyze the actual image
+  // For now, we'll return different responses based on image characteristics
+  
+  const responses: AIProductResponse[] = [
+    {
+      productName: "Fresh Organic Tomatoes",
+      description: "Juicy, farm-fresh organic tomatoes, perfect for salads, sauces, or eating fresh. Hand-picked from our local garden with care and attention to quality.",
+      suggestedPrice: 4.99,
+      suggestedCategory: "Vegetables"
+    },
+    {
+      productName: "Premium Leafy Greens",
+      description: "Crisp and nutritious leafy greens, grown without pesticides. Perfect for healthy salads, smoothies, and cooking. Harvested daily for maximum freshness.",
+      suggestedPrice: 3.49,
+      suggestedCategory: "Vegetables"
+    },
+    {
+      productName: "Sweet Garden Carrots",
+      description: "Crunchy, sweet carrots packed with beta-carotene and natural goodness. Ideal for snacking, cooking, or juicing. Grown in rich, organic soil.",
+      suggestedPrice: 2.99,
+      suggestedCategory: "Vegetables"
+    },
+    {
+      productName: "Fresh Seasonal Fruits",
+      description: "Delicious seasonal fruits bursting with natural sweetness and vitamins. Perfect for healthy snacking, desserts, or breakfast additions.",
+      suggestedPrice: 5.99,
+      suggestedCategory: "Fruits"
+    }
+  ];
+  
+  // Return a random response for variety in the prototype
+  return responses[Math.floor(Math.random() * responses.length)];
+};
