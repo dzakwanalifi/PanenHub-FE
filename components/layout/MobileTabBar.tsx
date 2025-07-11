@@ -2,6 +2,7 @@
 import { useEffect, useState } from 'react';
 import { Home, Users, ShoppingCart, ScrollText, User, MessageSquare } from 'lucide-react';
 import { useCartStore } from '@/store/cartStore';
+import ClientOnly from '../ClientOnly';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 
@@ -37,11 +38,13 @@ export default function MobileTabBar() {
             >
               <div className="relative">
                 <tab.icon className="w-6 h-6" />
-                {hasMounted && tab.badge && tab.badge > 0 && (
-                  <span className="absolute -top-2 -right-2 bg-[#2E7D32] text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
-                    {tab.badge}
-                  </span>
-                )}
+                <ClientOnly>
+                  {tab.badge && tab.badge > 0 && (
+                    <span className="absolute -top-2 -right-2 bg-[#2E7D32] text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
+                      {tab.badge}
+                    </span>
+                  )}
+                </ClientOnly>
               </div>
               <span className="text-xs mt-1">{tab.label}</span>
             </Link>
