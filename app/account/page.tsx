@@ -1,3 +1,4 @@
+'use client';
 import { User, BookMarked, CreditCard, History, Bell, Shield, LogOut, Store, LayoutDashboard } from 'lucide-react';
 import { useAuthStore } from '@/store/authStore';
 import { useRouter } from 'next/navigation';
