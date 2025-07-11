@@ -18,7 +18,7 @@ export default function ProductPage({ params }: ProductPageProps) {
   const product = getProductById(params.id);
 
   return (
-    <div>
+    <div className="bg-white">
       <ProductDetailWrapper product={product} />
     </div>
   );

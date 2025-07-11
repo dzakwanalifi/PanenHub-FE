@@ -30,6 +30,9 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
 
   return (
     <div className="container mx-auto px-4 py-8">
+      {/* Centered Page Title */}
+      <h1 className="text-2xl md:text-3xl font-bold text-[#1F2937] mb-8 text-center">Product Details</h1>
+      
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         {/* Product Image */}
         <div className="space-y-4">
@@ -45,23 +48,23 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
         {/* Product Info */}
         <div className="space-y-6">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900 mb-2">{product.name}</h1>
+            <h2 className="text-3xl font-bold text-[#1F2937] mb-2">{product.name}</h2>
             <Link
               href={`/stores/${product.store}`}
-              className="text-[#2E7D32] hover:underline font-medium"
+              className="text-gray-500 hover:underline font-medium"
             >
               {product.store}
             </Link>
             <div className="flex items-center space-x-3 mt-2">
               <Link
                 href={`/store/${product.store.toLowerCase().replace(/\s+/g, '-')}`}
-                className="text-sm text-gray-600 hover:text-[#2E7D32] transition-colors"
+                className="text-sm text-gray-500 hover:text-[#A5D6A7] transition-colors"
               >
                 Visit Store
               </Link>
               <button
                 onClick={() => console.log('Chat with seller')}
-                className="text-sm bg-[#2E7D32] text-white px-3 py-1 rounded-lg hover:bg-[#1B5E20] transition-colors"
+                className="text-sm bg-[#A5D6A7] text-[#1F2937] px-3 py-1 rounded-full hover:bg-[#B9E4C9] transition-colors"
               >
                 Chat with Seller
               </button>
@@ -86,26 +89,26 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
           </div>
 
           {/* Price */}
-          <div className="text-3xl font-bold text-[#2E7D32]">
+          <div className="text-3xl font-bold text-[#1F2937]">
             ${product.price.toFixed(2)}
             <span className="text-lg text-gray-500 ml-2">/kg</span>
           </div>
 
           {/* Description */}
           <div>
-            <h3 className="text-lg font-semibold mb-2">Description</h3>
-            <p className="text-gray-600">{product.description}</p>
+            <h3 className="text-lg font-semibold text-[#1F2937] mb-2">Description</h3>
+            <p className="text-gray-500">{product.description}</p>
           </div>
 
           {/* Product Details */}
           <div>
-            <h3 className="text-lg font-semibold mb-2">Product Details</h3>
-            <p className="text-gray-600">{product.details}</p>
+            <h3 className="text-lg font-semibold text-[#1F2937] mb-2">Product Details</h3>
+            <p className="text-gray-500">{product.details}</p>
           </div>
 
           {/* Quantity Selector */}
           <div>
-            <h3 className="text-lg font-semibold mb-2">Quantity</h3>
+            <h3 className="text-lg font-semibold text-[#1F2937] mb-3">Quantity</h3>
             <QuantityStepper
               quantity={quantity}
               onQuantityChange={setQuantity}
@@ -120,13 +123,13 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
               className={`p-3 rounded-lg border transition-colors ${
                 isFavorite
                   ? 'border-red-500 text-red-500 bg-red-50'
-                  : 'border-gray-300 text-gray-600 hover:bg-gray-50'
+                  : 'border-gray-300 text-[#1F2937] hover:bg-gray-50'
               }`}
             >
               <Heart className={`w-6 h-6 ${isFavorite ? 'fill-current' : ''}`} />
             </button>
             
-            <button className="p-3 rounded-lg border border-gray-300 text-gray-600 hover:bg-gray-50">
+            <button className="p-3 rounded-lg border border-gray-300 text-[#1F2937] hover:bg-gray-50">
               <Share2 className="w-6 h-6" />
             </button>
           </div>
@@ -137,7 +140,7 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
       <div className="lg:hidden fixed bottom-20 left-4 right-4 z-40">
         <button
           onClick={handleAddToCart}
-          className="w-full bg-[#2E7D32] text-white py-4 rounded-lg text-lg font-semibold hover:bg-[#1B5E20] transition-colors"
+          className="w-full bg-[#A5D6A7] text-[#1F2937] py-4 rounded-full text-lg font-semibold hover:bg-[#B9E4C9] transition-colors"
         >
           Add to Cart - ${(product.price * quantity).toFixed(2)}
         </button>
@@ -147,7 +150,7 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
       <div className="hidden lg:block mt-8">
         <button
           onClick={handleAddToCart}
-          className="bg-[#2E7D32] text-white px-8 py-4 rounded-lg text-lg font-semibold hover:bg-[#1B5E20] transition-colors"
+          className="bg-[#A5D6A7] text-[#1F2937] px-8 py-4 rounded-full text-lg font-semibold hover:bg-[#B9E4C9] transition-colors"
         >
           Add to Cart - ${(product.price * quantity).toFixed(2)}
         </button>
