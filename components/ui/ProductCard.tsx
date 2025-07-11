@@ -2,6 +2,7 @@
 import { Heart, Plus } from 'lucide-react';
 import { useState } from 'react';
 import { useCartStore } from '@/store/cartStore';
+import { useFavoriteStore } from '@/store/favoriteStore';
 import Image from 'next/image';
 import { formatPrice } from '@/lib/constants';
 import Link from 'next/link';
