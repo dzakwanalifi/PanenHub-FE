@@ -63,14 +63,6 @@ export default function Header() {
               )}
             </div>
             <Link href="/cart" aria-label="View shopping cart" className="relative p-2 text-[#1F2937] hover:text-[#A5D6A7] transition-colors">
-            <div className="hidden md:block">
-              <Link href="/cart" aria-label="View shopping cart" className="relative p-2 text-[#1F2937] hover:text-[#A5D6A7] transition-colors">
-                <ShoppingCart className="w-6 h-6" />
-                <span className={`absolute -top-1 -right-1 bg-[#A5D6A7] text-white text-xs rounded-full w-5 h-5 flex items-center justify-center ${itemCount > 0 ? '' : 'hidden'}`}>
-                  {itemCount}
-                </span>
-              </Link>
-            </div>
               <ShoppingCart className="w-6 h-6" />
               <span className={`absolute -top-1 -right-1 bg-[#A5D6A7] text-white text-xs rounded-full w-5 h-5 flex items-center justify-center ${itemCount > 0 ? '' : 'hidden'}`}>
                 {itemCount}
