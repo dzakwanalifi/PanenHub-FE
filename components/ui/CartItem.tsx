@@ -58,6 +58,9 @@ export default function CartItem({ item }: CartItemProps) {
           </div>
         </div>
       </div>
+      <div className="flex items-center">
             <span className="text-lg font-bold text-gray-900">{formatPrice(item.price * item.quantity)}</span>
+      </div>
+    </div>
   );
 }

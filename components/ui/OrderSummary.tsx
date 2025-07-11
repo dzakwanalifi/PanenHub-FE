@@ -17,12 +17,13 @@ export default function OrderSummary() {
   }
 
   return (
-          <span className="font-semibold">{formatPrice(subtotal)}</span>
+    <div className="bg-white rounded-2xl shadow-lg p-6">
       <h3 className="text-lg font-semibold text-[#1F2937] mb-4">Order Summary</h3>
       
       <div className="space-y-3">
         <div className="flex justify-between items-center">
           <span className="text-[#1F2937]">Subtotal</span>
+          <span className="font-semibold">{formatPrice(subtotal)}</span>
           <span className="font-semibold text-[#1F2937]">${subtotal.toFixed(2)}</span>
         </div>
         
@@ -47,6 +48,7 @@ export default function OrderSummary() {
           <span className="font-bold text-[#2E7D32]">{formatPrice(total)}</span>
         </div>
       </div>
+    </div>
 
       <div className="mt-6">
         <Link href="/checkout">
