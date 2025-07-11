@@ -1,6 +1,7 @@
 'use client';
 import { useState } from 'react';
 import { Star, Heart, Share2 } from 'lucide-react';
+import Image from 'next/image';
 import { useCartStore } from '@/store/cartStore';
 import QuantityStepper from '@/components/ui/QuantityStepper';
 import Link from 'next/link';
@@ -36,11 +37,13 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         {/* Product Image */}
         <div className="space-y-4">
-          <div className="aspect-square rounded-2xl overflow-hidden">
-            <img
+          <div className="aspect-square rounded-2xl overflow-hidden relative">
+            <Image
               src={product.image}
               alt={product.name}
-              className="w-full h-full object-cover"
+              fill
+              className="object-cover"
+              sizes="(max-width: 768px) 100vw, 50vw"
             />
           </div>
         </div>
@@ -120,6 +123,7 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
           <div className="flex items-center space-x-4">
             <button
               onClick={() => setIsFavorite(!isFavorite)}
+              aria-label={isFavorite ? "Remove from favorites" : "Add to favorites"}
               className={`p-3 rounded-lg border transition-colors ${
                 isFavorite
                   ? 'border-red-500 text-red-500 bg-red-50'
@@ -129,7 +133,7 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
               <Heart className={`w-6 h-6 ${isFavorite ? 'fill-current' : ''}`} />
             </button>
             
-            <button className="p-3 rounded-lg border border-gray-300 text-[#1F2937] hover:bg-gray-50">
+            <button aria-label="Share product" className="p-3 rounded-lg border border-gray-300 text-[#1F2937] hover:bg-gray-50">
               <Share2 className="w-6 h-6" />
             </button>
           </div>

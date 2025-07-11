@@ -44,13 +44,14 @@ export default function Header() {
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center space-x-4">
             {isLoggedIn && (
-              <Link href="/messages" className="p-2 text-[#1F2937] hover:text-[#A5D6A7] transition-colors">
+              <Link href="/messages" aria-label="View messages" className="p-2 text-[#1F2937] hover:text-[#A5D6A7] transition-colors">
                 <MessageSquare className="w-6 h-6" />
               </Link>
             )}
             <div className="relative">
               <button
                 onClick={() => setIsNotificationOpen(!isNotificationOpen)}
+                aria-label="View notifications"
                 className="relative p-2 text-[#1F2937] hover:text-[#A5D6A7] transition-colors"
               >
                 <Bell className="w-6 h-6" />
@@ -62,7 +63,7 @@ export default function Header() {
                 <NotificationPanel onClose={() => setIsNotificationOpen(false)} />
               )}
             </div>
-            <Link href="/cart" className="relative p-2 text-[#1F2937] hover:text-[#A5D6A7] transition-colors">
+            <Link href="/cart" aria-label="View shopping cart" className="relative p-2 text-[#1F2937] hover:text-[#A5D6A7] transition-colors">
               <ShoppingCart className="w-6 h-6" />
               <span className={`absolute -top-1 -right-1 bg-[#A5D6A7] text-white text-xs rounded-full w-5 h-5 flex items-center justify-center ${itemCount > 0 ? '' : 'hidden'}`}>
                 {itemCount}
@@ -119,12 +120,13 @@ export default function Header() {
           {/* Mobile Menu Button */}
           <div className="md:hidden flex items-center space-x-2">
             {isLoggedIn && (
-              <Link href="/messages" className="p-2 text-[#1F2937]">
+              <Link href="/messages" aria-label="View messages" className="p-2 text-[#1F2937]">
                 <MessageSquare className="w-6 h-6" />
               </Link>
             )}
             <button
               onClick={() => setIsNotificationOpen(!isNotificationOpen)}
+              aria-label="View notifications"
               className="relative p-2 text-[#1F2937]"
             >
               <Bell className="w-6 h-6" />
@@ -132,7 +134,7 @@ export default function Header() {
                 3
               </span>
             </button>
-            <Link href="/cart" className="relative p-2 text-[#1F2937]">
+            <Link href="/cart" aria-label="View shopping cart" className="relative p-2 text-[#1F2937]">
               <ShoppingCart className="w-6 h-6" />
               <span className={`absolute -top-1 -right-1 bg-[#A5D6A7] text-white text-xs rounded-full w-5 h-5 flex items-center justify-center ${itemCount > 0 ? '' : 'hidden'}`}>
                 {itemCount}
@@ -140,6 +142,7 @@ export default function Header() {
             </Link>
             <button
               onClick={() => setIsMenuOpen(!isMenuOpen)}
+              aria-label={isMenuOpen ? "Close menu" : "Open menu"}
               className="p-2 text-[#1F2937]"
             >
               {isMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}

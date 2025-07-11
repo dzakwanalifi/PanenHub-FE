@@ -1,64 +1,53 @@
-import React from 'react';
-import { cn } from '@/lib/utils';
-import { User } from 'lucide-react';
+'use client';
+import Image from 'next/image';
 
 interface AvatarProps {
   src?: string;
   alt?: string;
   size?: 'sm' | 'md' | 'lg' | 'xl';
-  className?: string;
   fallback?: string;
+  className?: string;
 }
 
-export default function Avatar({ 
-  src, 
-  alt, 
-  size = 'md', 
-  className,
-  fallback 
-}: AvatarProps) {
-  const sizes = {
-    sm: 'h-8 w-8',
-    md: 'h-10 w-10',
-    lg: 'h-12 w-12',
-    xl: 'h-16 w-16'
+export default function Avatar({ src, alt, size = 'md', fallback, className = '' }: AvatarProps) {
+  const sizeClasses = {
+    sm: 'w-8 h-8',
+    md: 'w-10 h-10',
+    lg: 'w-16 h-16',
+    xl: 'w-24 h-24',
   };
-  
-  const iconSizes = {
-    sm: 'h-4 w-4',
-    md: 'h-5 w-5',
-    lg: 'h-6 w-6',
-    xl: 'h-8 w-8'
+
+  const textSizeClasses = {
+    sm: 'text-xs',
+    md: 'text-sm',
+    lg: 'text-lg',
+    xl: 'text-2xl',
   };
-  
-  if (src) {
-    return (
-      <img
-        src={src}
-        alt={alt || 'Avatar'}
-        className={cn(
-          'rounded-full object-cover',
-          sizes[size],
-          className
-        )}
-      />
-    );
-  }
-  
+
+  const getInitials = (name?: string) => {
+    if (!name) return '?';
+    return name
+      .split(' ')
+      .map(word => word.charAt(0))
+      .join('')
+      .toUpperCase()
+      .slice(0, 2);
+  };
+
   return (
-    <div
-      className={cn(
-        'rounded-full bg-gray-100 flex items-center justify-center',
-        sizes[size],
-        className
-      )}
-    >
-      {fallback ? (
-        <span className="text-gray-600 font-medium text-sm">
-          {fallback.charAt(0).toUpperCase()}
-        </span>
+    <div className={`${sizeClasses[size]} rounded-full overflow-hidden bg-gray-200 flex items-center justify-center ${className}`}>
+      {src ? (
+        <Image
+          src={src}
+          alt={alt || 'Avatar'}
+          width={size === 'sm' ? 32 : size === 'md' ? 40 : size === 'lg' ? 64 : 96}
+          height={size === 'sm' ? 32 : size === 'md' ? 40 : size === 'lg' ? 64 : 96}
+          className="object-cover"
+        />
       ) : (
-        <User className={cn('text-gray-400', iconSizes[size])} />
+        <span className={`font-medium text-gray-600 ${textSizeClasses[size]}`}>
+          {getInitials(fallback)}
+        </span>
       )}
     </div>
   );

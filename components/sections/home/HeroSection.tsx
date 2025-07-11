@@ -1,5 +1,5 @@
 'use client';
-import { MapPin, Search, Bell, Truck } from 'lucide-react';
+import { MapPin, Truck } from 'lucide-react';
 import Link from 'next/link';
 import { useState } from 'react';
 import { useDeliveryStore } from '@/store/deliveryStore';
@@ -17,6 +17,7 @@ export default function HeroSection() {
       <div className="flex items-center justify-between mb-6">
         <button 
           onClick={() => setIsLocationModalOpen(true)}
+          aria-label="Change delivery location"
           className="flex items-center space-x-2 hover:bg-[#F3F4F6] p-2 rounded-lg transition-colors"
         >
           <MapPin className="w-5 h-5 text-[#1F2937]" />
@@ -25,14 +26,6 @@ export default function HeroSection() {
             <p className="font-semibold text-[#1F2937]">{currentLocation.name}</p>
           </div>
         </button>
-        <div className="flex items-center space-x-3">
-          <button className="p-2 text-[#1F2937] hover:text-[#A5D6A7] transition-colors">
-            <Search className="w-6 h-6" />
-          </button>
-          <button className="p-2 text-[#1F2937] hover:text-[#A5D6A7] transition-colors">
-            <Bell className="w-6 h-6" />
-          </button>
-        </div>
       </div>
 
       {/* Delivery/Pickup Toggle */}
@@ -40,6 +33,7 @@ export default function HeroSection() {
         <div className="bg-[#F3F4F6] rounded-full p-1 inline-flex">
           <button
             onClick={() => setDeliveryMode('delivery')}
+            aria-label="Select delivery mode"
             className={`px-6 py-2 rounded-full text-sm font-medium transition-all ${
               deliveryMode === 'delivery'
                 ? 'bg-white text-[#1F2937] shadow-sm'
@@ -51,6 +45,7 @@ export default function HeroSection() {
           </button>
           <button
             onClick={() => setDeliveryMode('pickup')}
+            aria-label="Select pickup mode"
             className={`px-6 py-2 rounded-full text-sm font-medium transition-all ${
               deliveryMode === 'pickup'
                 ? 'bg-white text-[#1F2937] shadow-sm'

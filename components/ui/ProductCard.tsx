@@ -1,7 +1,8 @@
 'use client';
-import { Star, ShoppingCart } from 'lucide-react';
-import { useCartStore } from '@/store/cartStore';
+import { Star, Plus } from 'lucide-react';
+import Image from 'next/image';
 import Link from 'next/link';
+import { useCartStore } from '@/store/cartStore';
 
 interface ProductCardProps {
   id: string;
@@ -38,26 +39,16 @@ export default function ProductCard({
 
   return (
     <Link href={`/products/${id}`}>
-      <div className="bg-white rounded-2xl border border-gray-200 overflow-hidden hover:border-gray-300 transition-colors cursor-pointer">
-        <div className="relative">
-          <img
+      <div className="bg-white rounded-2xl overflow-hidden hover:shadow-lg transition-shadow">
+        <div className="relative h-48">
+          <Image
             src={image}
             alt={name}
-            className="w-full h-48 object-cover"
+            fill
+            className="object-cover"
+            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
           />
-          {discount && (
-            <div className="absolute top-3 left-3 bg-red-500 text-white px-2 py-1 rounded-lg text-sm font-semibold">
-              -{discount}%
-            </div>
-          )}
-          <button
-            onClick={handleAddToCart}
-            className="absolute top-3 right-3 w-10 h-10 bg-white rounded-full border border-gray-200 flex items-center justify-center hover:bg-gray-50 transition-colors"
-          >
-            <ShoppingCart className="w-5 h-5 text-[#1F2937]" />
-          </button>
         </div>
-
         <div className="p-4">
           <h3 className="text-lg font-semibold text-[#1F2937] mb-2 line-clamp-2">
             {name}
@@ -94,6 +85,13 @@ export default function ProductCard({
                 </span>
               )}
             </div>
+            <button
+              onClick={handleAddToCart}
+              aria-label={`Add ${name} to cart`}
+              className="bg-[#2E7D32] text-white p-2 rounded-lg hover:bg-[#1B5E20] transition-colors"
+            >
+              <Plus className="w-4 h-4" />
+            </button>
           </div>
         </div>
       </div>
