@@ -3,7 +3,7 @@ import { Search } from 'lucide-react';
 
 interface SearchBarProps {
   searchTerm: string;
-  onSearchChange: (term: string) => void;
+  onSearchChange?: (term: string) => void;
   placeholder?: string;
 }
 
@@ -18,7 +18,7 @@ export default function SearchBar({
       <input
         type="text"
         value={searchTerm}
-        onChange={(e) => onSearchChange(e.target.value)}
+        onChange={(e) => onSearchChange?.(e.target.value)}
         placeholder={placeholder}
         className="w-full pl-10 pr-4 py-3 bg-[#F3F4F6] border-0 rounded-full focus:ring-2 focus:ring-[#A5D6A7] focus:outline-none text-[#1F2937] placeholder-gray-500"
       />
