@@ -12,10 +12,9 @@ export default function SignUpPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
+  const [localError, setLocalError] = useState('');
   
-  const { register, isLoggedIn } = useAuthStore();
+  const { register, isLoggedIn, isLoading, error, clearError } = useAuthStore();
   const router = useRouter();
   
   useEffect(() => {
@@ -26,24 +25,20 @@ export default function SignUpPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError('');
+    setLocalError('');
+    clearError();
     
     if (password !== confirmPassword) {
-      setError('Passwords do not match');
+      setLocalError('Passwords do not match');
       return;
     }
-    
-    setLoading(true);
     
     const result = await register(name, email, password);
     
     if (result.success) {
       router.push('/');
-    } else {
-      setError(result.error || 'Registration failed');
     }
-    
-    setLoading(false);
+    // Error handling is now managed by the store
   };
 
   return (
@@ -91,8 +86,8 @@ export default function SignUpPage() {
             required
           />
 
-          {error && (
-            <div className="text-red-600 text-sm">{error}</div>
+          {(error || localError) && (
+            <div className="text-red-600 text-sm">{error || localError}</div>
           )}
 
           <div>
@@ -115,7 +110,7 @@ export default function SignUpPage() {
             type="submit"
             className="w-full"
             size="lg"
-            loading={loading}
+            loading={isLoading}
           >
             Create Account
           </Button>

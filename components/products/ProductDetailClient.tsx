@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { Star, Heart, Share2 } from 'lucide-react';
 import Image from 'next/image';
 import { useCartStore } from '@/store/cartStore';
+import { useFavoriteStore } from '@/store/favoriteStore';
 import QuantityStepper from '@/components/ui/QuantityStepper';
 import StarRating from '@/components/ui/StarRating';
 import Link from 'next/link';
@@ -14,9 +15,12 @@ interface ProductDetailClientProps {
 
 export default function ProductDetailClient({ product }: ProductDetailClientProps) {
   const [quantity, setQuantity] = useState(1);
-  const [isFavorite, setIsFavorite] = useState(false);
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
   const addItem = useCartStore((state) => state.addItem);
+  const { isFavorite, toggleFavorite } = useFavoriteStore((state) => ({
+    isFavorite: state.isFavorite(product.id),
+    toggleFavorite: state.toggleFavorite,
+  }));
 
   const handleAddToCart = () => {
     for (let i = 0; i < quantity; i++) {
@@ -29,6 +33,38 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
       });
     }
     console.log('Added to cart:', product.name, 'Quantity:', quantity);
+  };
+
+  const handleShare = async () => {
+    const shareData = {
+      title: product.name,
+      text: `Check out this ${product.name} from ${product.store} on PanenHub!`,
+      url: window.location.href,
+    };
+
+    if (navigator.share) {
+      try {
+        await navigator.share(shareData);
+        console.log('Successfully shared');
+      } catch (error) {
+        console.log('Error sharing:', error);
+        // Fallback to copying to clipboard
+        handleFallbackShare();
+      }
+    } else {
+      // Fallback for browsers that don't support Web Share API
+      handleFallbackShare();
+    }
+  };
+
+  const handleFallbackShare = () => {
+    const url = window.location.href;
+    navigator.clipboard.writeText(url).then(() => {
+      alert('Link copied to clipboard!');
+    }).catch(() => {
+      // Final fallback - just alert the URL
+      alert(`Share this product: ${url}`);
+    });
   };
 
   return (
@@ -110,7 +146,7 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
           {/* Price */}
           <div className="text-3xl font-bold text-[#1F2937]">
             ${product.price.toFixed(2)}
-            <span className="text-lg text-gray-500 ml-2">/kg</span>
+            <span className="text-lg text-gray-500 ml-2">/{product.unit}</span>
           </div>
 
           {/* Description */}
@@ -138,7 +174,7 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
           {/* Action Buttons */}
           <div className="flex items-center space-x-4">
             <button
-              onClick={() => setIsFavorite(!isFavorite)}
+              onClick={() => toggleFavorite(product.id)}
               aria-label={isFavorite ? "Remove from favorites" : "Add to favorites"}
               className={`p-3 rounded-lg border transition-colors ${
                 isFavorite
@@ -149,7 +185,11 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
               <Heart className={`w-6 h-6 ${isFavorite ? 'fill-current' : ''}`} />
             </button>
             
-            <button aria-label="Share product" className="p-3 rounded-lg border border-gray-300 text-[#1F2937] hover:bg-gray-50">
+            <button 
+              onClick={handleShare}
+              aria-label="Share product" 
+              className="p-3 rounded-lg border border-gray-300 text-[#1F2937] hover:bg-gray-50 transition-colors"
+            >
               <Share2 className="w-6 h-6" />
             </button>
           </div>

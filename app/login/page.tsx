@@ -10,10 +10,8 @@ import Input from '@/components/ui/Input';
 export default function LoginPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
   
-  const { login, isLoggedIn } = useAuthStore();
+  const { login, isLoggedIn, isLoading, error, clearError } = useAuthStore();
   const router = useRouter();
   
   useEffect(() => {
@@ -24,18 +22,14 @@ export default function LoginPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setLoading(true);
-    setError('');
+    clearError();
     
     const result = await login(email, password);
     
     if (result.success) {
       router.push('/');
-    } else {
-      setError(result.error || 'Login failed');
     }
-    
-    setLoading(false);
+    // Error handling is now managed by the store
   };
 
   return (
@@ -83,7 +77,7 @@ export default function LoginPage() {
             type="submit"
             className="w-full"
             size="lg"
-            loading={loading}
+            loading={isLoading}
           >
             Sign In
           </Button>

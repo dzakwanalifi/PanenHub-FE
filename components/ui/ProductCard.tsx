@@ -13,16 +13,17 @@ interface ProductCardProps {
   name: string;
   price: number;
   originalPrice?: number;
-  originalPrice?: number;
-  originalPrice?: number;
   image: string;
   store: string;
   rating: number;
 }
 
 export default function ProductCard({ id, name, price, originalPrice, image, rating, store }: ProductCardProps) {
-  const [isFavorite, setIsFavorite] = useState(false);
   const addItem = useCartStore((state) => state.addItem);
+  const { isFavorite, toggleFavorite } = useFavoriteStore((state) => ({
+    isFavorite: state.isFavorite(id),
+    toggleFavorite: state.toggleFavorite,
+  }));
 
   const hasDiscount = originalPrice && originalPrice > price;
 
@@ -48,7 +49,7 @@ export default function ProductCard({ id, name, price, originalPrice, image, rat
       )}
       
       <button
-        onClick={() => setIsFavorite(!isFavorite)}
+        onClick={() => toggleFavorite(id)}
         className="absolute top-2 right-2 p-2 rounded-full bg-white/80 hover:bg-white transition-colors z-10"
       >
         <Heart

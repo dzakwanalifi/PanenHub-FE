@@ -3,6 +3,7 @@ export interface Product {
   id: string;
   name: string;
   price: number;
+  unit: string; // e.g., 'kg', 'lb', 'piece', 'bunch'
   image: string;
   images: string[]; // Array of all product images
   rating: number;
@@ -18,6 +19,7 @@ export const products: Product[] = [
     id: '1',
     name: 'Organic Carrots',
     price: 2.99,
+    unit: 'kg',
     image: 'https://images.unsplash.com/photo-1445282768818-728615cc910a?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
     images: [
       'https://images.unsplash.com/photo-1445282768818-728615cc910a?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
@@ -35,6 +37,7 @@ export const products: Product[] = [
     id: '2',
     name: 'Fresh Spinach',
     price: 3.49,
+    unit: 'bunch',
     image: 'https://images.unsplash.com/photo-1576045057995-568f588f82fb?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
     images: [
       'https://images.unsplash.com/photo-1576045057995-568f588f82fb?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
@@ -51,6 +54,7 @@ export const products: Product[] = [
     id: '3',
     name: 'Red Bell Peppers',
     price: 4.99,
+    unit: 'kg',
     image: 'https://images.unsplash.com/photo-1563565375-f3fdfdbefa83?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
     images: [
       'https://images.unsplash.com/photo-1563565375-f3fdfdbefa83?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
@@ -67,6 +71,7 @@ export const products: Product[] = [
     id: '4',
     name: 'Organic Tomatoes',
     price: 3.99,
+    unit: 'kg',
     image: 'https://images.unsplash.com/photo-1546470427-e5380e0e4a36?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
     images: [
       'https://images.unsplash.com/photo-1546470427-e5380e0e4a36?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
@@ -84,6 +89,7 @@ export const products: Product[] = [
     id: '5',
     name: 'Fresh Broccoli',
     price: 2.79,
+    unit: 'piece',
     image: 'https://images.unsplash.com/photo-1459411621453-7b03977f4bfc?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
     images: [
       'https://images.unsplash.com/photo-1459411621453-7b03977f4bfc?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
@@ -100,6 +106,7 @@ export const products: Product[] = [
     id: '6',
     name: 'Sweet Corn',
     price: 1.99,
+    unit: 'piece',
     image: 'https://images.unsplash.com/photo-1551754655-cd27e38d2076?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
     images: [
       'https://images.unsplash.com/photo-1551754655-cd27e38d2076?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
@@ -116,6 +123,7 @@ export const products: Product[] = [
     id: '7',
     name: 'Organic Lettuce',
     price: 2.49,
+    unit: 'head',
     image: 'https://images.unsplash.com/photo-1622206151226-18ca2c9ab4a1?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
     images: [
       'https://images.unsplash.com/photo-1622206151226-18ca2c9ab4a1?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
@@ -132,6 +140,7 @@ export const products: Product[] = [
     id: '8',
     name: 'Purple Eggplant',
     price: 3.29,
+    unit: 'piece',
     image: 'https://images.unsplash.com/photo-1659261200833-ec8761558af7?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
     images: [
       'https://images.unsplash.com/photo-1659261200833-ec8761558af7?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
