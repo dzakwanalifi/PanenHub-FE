@@ -150,11 +150,3 @@ export default function AccountPage() {
     </ProtectedRoute>
   );
 }
-
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-}
