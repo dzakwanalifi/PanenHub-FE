@@ -1,5 +1,6 @@
 'use client';
 import { Trash2 } from 'lucide-react';
+import Image from 'next/image';
 import { useCartStore, CartItem as CartItemType } from '@/store/cartStore';
 import QuantityStepper from './QuantityStepper';
 
@@ -21,11 +22,15 @@ export default function CartItem({ item }: CartItemProps) {
   return (
     <div className="bg-white border border-gray-200 rounded-2xl p-4 mb-4">
       <div className="flex items-center space-x-4">
-        <img
-          src={item.image}
-          alt={item.name}
-          className="w-16 h-16 object-cover rounded-xl"
-        />
+        <div className="relative w-16 h-16 rounded-lg overflow-hidden">
+          <Image
+            src={item.image}
+            alt={item.name}
+            fill
+            className="object-cover"
+            sizes="64px"
+          />
+        </div>
         
         <div className="flex-1">
           <h3 className="font-semibold text-[#1F2937] mb-1">{item.name}</h3>
@@ -43,6 +48,7 @@ export default function CartItem({ item }: CartItemProps) {
               />
               <button
                 onClick={handleRemove}
+                aria-label={`Remove ${item.name} from cart`}
                 className="p-2 text-red-500 hover:bg-red-50 rounded-lg transition-colors"
               >
                 <Trash2 className="w-4 h-4" />
