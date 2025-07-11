@@ -2,6 +2,7 @@
 import { ReactNode } from 'react';
 import Header from './Header';
 import MobileTabBar from './MobileTabBar';
+import ClientOnly from '../ClientOnly';
 
 interface MainLayoutProps {
   children: ReactNode;
@@ -10,11 +11,15 @@ interface MainLayoutProps {
 export default function MainLayout({ children }: MainLayoutProps) {
   return (
     <div className="min-h-screen bg-[#F7F8FA]">
-      <Header />
+      <ClientOnly>
+        <Header />
+      </ClientOnly>
       <main className="pb-20 md:pb-0">
         {children}
       </main>
-      <MobileTabBar />
+      <ClientOnly>
+        <MobileTabBar />
+      </ClientOnly>
     </div>
   );
 }
