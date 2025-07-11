@@ -1,8 +1,9 @@
 'use client';
-import { useState, useEffect } from 'react';
+import { useEffect } from 'react';
 import { Leaf, ShoppingCart, Search, Menu, X, Bell, MessageSquare, User, LogOut } from 'lucide-react';
 import { useCartStore } from '@/store/cartStore';
 import { useAuthStore } from '@/store/authStore';
+import { useUIStore } from '@/store/uiStore';
 import SearchBar from '../ui/SearchBar';
 import NotificationPanel from '../notifications/NotificationPanel';
 import ClientOnly from '../ClientOnly';
@@ -10,12 +11,10 @@ import Link from 'next/link';
 import Avatar from '../ui/Avatar';
 
 export default function Header() {
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [isNotificationOpen, setIsNotificationOpen] = useState(false);
-  const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
   const [hasMounted, setHasMounted] = useState(false);
   const itemCount = useCartStore((state) => state.getItemCount());
   const { isLoggedIn, user, logout } = useAuthStore();
+  const { activeOverlay, setActiveOverlay, closeAllOverlays } = useUIStore();
 
   useEffect(() => {
     setHasMounted(true);
@@ -23,7 +22,7 @@ export default function Header() {
 
   const handleLogout = () => {
     logout();
-    setIsUserMenuOpen(false);
+    closeAllOverlays();
   };
 
   return (
@@ -50,7 +49,7 @@ export default function Header() {
             )}
             <div className="relative">
               <button
-                onClick={() => setIsNotificationOpen(!isNotificationOpen)}
+                onClick={() => setActiveOverlay(activeOverlay === 'notifications' ? 'none' : 'notifications')}
                 aria-label="View notifications"
                 className="relative p-2 text-[#1F2937] hover:text-[#A5D6A7] transition-colors"
               >
@@ -59,8 +58,8 @@ export default function Header() {
                   3
                 </span>
               </button>
-              {isNotificationOpen && (
-                <NotificationPanel onClose={() => setIsNotificationOpen(false)} />
+              {activeOverlay === 'notifications' && (
+                <NotificationPanel onClose={closeAllOverlays} />
               )}
             </div>
             <Link href="/cart" aria-label="View shopping cart" className="relative p-2 text-[#1F2937] hover:text-[#A5D6A7] transition-colors">
@@ -73,18 +72,18 @@ export default function Header() {
             {isLoggedIn ? (
               <div className="relative">
                 <button
-                  onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
+                  onClick={() => setActiveOverlay(activeOverlay === 'userMenu' ? 'none' : 'userMenu')}
                   className="flex items-center space-x-2 p-2 rounded-lg hover:bg-gray-100 transition-colors"
                 >
                   <Avatar src={user?.avatar} alt={user?.name} size="sm" fallback={user?.name} />
                   <span className="text-sm font-medium text-gray-700">{user?.name}</span>
                 </button>
                 
-                {isUserMenuOpen && (
+                {activeOverlay === 'userMenu' && (
                   <div className="absolute right-0 top-full mt-2 w-48 bg-white rounded-2xl border border-gray-200 py-2">
                     <Link
                       href="/account"
-                      onClick={() => setIsUserMenuOpen(false)}
+                      onClick={closeAllOverlays}
                       className="flex items-center px-4 py-2 text-sm text-[#1F2937] hover:bg-[#F3F4F6]"
                     >
                       <User className="w-4 h-4 mr-2" />
@@ -93,7 +92,7 @@ export default function Header() {
                     {user?.isSeller && (
                       <Link
                         href="/dashboard/mystore"
-                        onClick={() => setIsUserMenuOpen(false)}
+                        onClick={closeAllOverlays}
                         className="flex items-center px-4 py-2 text-sm text-[#1F2937] hover:bg-[#F3F4F6]"
                       >
                         <ShoppingCart className="w-4 h-4 mr-2" />
@@ -141,11 +140,11 @@ export default function Header() {
               </span>
             </Link>
             <button
-              onClick={() => setIsMenuOpen(!isMenuOpen)}
-              aria-label={isMenuOpen ? "Close menu" : "Open menu"}
+              onClick={() => setActiveOverlay(activeOverlay === 'mobileMenu' ? 'none' : 'mobileMenu')}
+              aria-label={activeOverlay === 'mobileMenu' ? "Close menu" : "Open menu"}
               className="p-2 text-[#1F2937]"
             >
-              {isMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+              {activeOverlay === 'mobileMenu' ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
             </button>
           </div>
         </div>
@@ -153,7 +152,7 @@ export default function Header() {
       </div>
 
       {/* Mobile Menu */}
-      {isMenuOpen && (
+      {activeOverlay === 'mobileMenu' && (
         <div className="md:hidden bg-white border-t border-gray-200 p-4">
           <div className="space-y-2">
             {isLoggedIn ? (
@@ -167,7 +166,7 @@ export default function Header() {
                 </div>
                 <Link
                   href="/account"
-                  onClick={() => setIsMenuOpen(false)}
+                  onClick={closeAllOverlays}
                   className="block w-full text-left px-4 py-2 text-[#1F2937] hover:bg-[#F3F4F6] rounded-lg"
                 >
                   My Account
@@ -175,7 +174,7 @@ export default function Header() {
                 {user?.isSeller && (
                   <Link
                     href="/dashboard/mystore"
-                    onClick={() => setIsMenuOpen(false)}
+                    onClick={closeAllOverlays}
                     className="block w-full text-left px-4 py-2 text-[#1F2937] hover:bg-[#F3F4F6] rounded-lg"
                   >
                     My Store
@@ -198,9 +197,9 @@ export default function Header() {
       )}
 
       {/* Mobile Notification Panel */}
-      {isNotificationOpen && (
+      {activeOverlay === 'notifications' && (
         <div className="md:hidden">
-          <NotificationPanel onClose={() => setIsNotificationOpen(false)} />
+          <NotificationPanel onClose={closeAllOverlays} />
         </div>
       )}
     </header>
