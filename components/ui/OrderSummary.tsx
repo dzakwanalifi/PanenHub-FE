@@ -2,6 +2,7 @@
 import { useCartStore } from '@/store/cartStore';
 import Button from './Button';
 import Link from 'next/link';
+import { formatPrice } from '@/lib/constants';
 
 export default function OrderSummary() {
   const { items, getTotal } = useCartStore();
@@ -16,7 +17,7 @@ export default function OrderSummary() {
   }
 
   return (
-    <div className="bg-white border border-gray-200 rounded-2xl p-6">
+          <span className="font-semibold">{formatPrice(subtotal)}</span>
       <h3 className="text-lg font-semibold text-[#1F2937] mb-4">Order Summary</h3>
       
       <div className="space-y-3">
@@ -38,12 +39,12 @@ export default function OrderSummary() {
             <span className="font-semibold text-green-600">-${discount.toFixed(2)}</span>
           </div>
         </div>
-        
+          <span className="font-semibold">{formatPrice(shipping)}</span>
         <div className="border-t border-dashed border-gray-300 pt-3">
           <div className="flex justify-between items-center text-lg">
             <span className="font-bold text-[#1F2937]">Total</span>
             <span className="font-bold text-[#1F2937]">${total.toFixed(2)}</span>
-          </div>
+          <span className="font-bold text-[#2E7D32]">{formatPrice(total)}</span>
         </div>
       </div>
 

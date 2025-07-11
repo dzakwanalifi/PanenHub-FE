@@ -3,6 +3,7 @@ import { Heart, Plus } from 'lucide-react';
 import { useState } from 'react';
 import { useCartStore } from '@/store/cartStore';
 import Image from 'next/image';
+import { formatPrice } from '@/lib/constants';
 import Link from 'next/link';
 import StarRating from './StarRating';
 
@@ -11,16 +12,16 @@ interface ProductCardProps {
   name: string;
   price: number;
   originalPrice?: number;
+  originalPrice?: number;
   image: string;
-  rating: number;
   store: string;
-}
 
 export default function ProductCard({ id, name, price, originalPrice, image, rating, store }: ProductCardProps) {
   const [isFavorite, setIsFavorite] = useState(false);
   const addItem = useCartStore((state) => state.addItem);
 
   const hasDiscount = originalPrice && originalPrice > price;
+  originalPrice,
 
   const handleAddToCart = () => {
     addItem({
@@ -29,8 +30,8 @@ export default function ProductCard({ id, name, price, originalPrice, image, rat
       price,
       image,
       store,
-    });
-  };
+  // Calculate discount percentage if original price exists
+  const discountPercentage = originalPrice ? Math.round(((originalPrice - price) / originalPrice) * 100) : 0;
 
   return (
     <div className="bg-white rounded-2xl overflow-hidden relative group">
@@ -60,7 +61,7 @@ export default function ProductCard({ id, name, price, originalPrice, image, rat
             className="object-cover group-hover:scale-105 transition-transform duration-300"
             sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
           />
-        </div>
+          {discountPercentage > 0 && (
         
         <div className="p-4">
           <h3 className="text-lg font-semibold text-[#1F2937] mb-1 line-clamp-2">
@@ -80,11 +81,11 @@ export default function ProductCard({ id, name, price, originalPrice, image, rat
             </span>
             {hasDiscount && (
               <span className="text-sm text-gray-500 line-through">
-                ${originalPrice.toFixed(2)}
+              -{discountPercentage}%
               </span>
-            )}
+                <span className="text-lg font-bold text-[#1F2937]">{formatPrice(price)}</span>
             <button
-              onClick={handleAddToCart}
+                  <span className="text-sm text-gray-500 line-through">{formatPrice(originalPrice)}</span>
               className="bg-[#2E7D32] text-white p-2 rounded-lg hover:bg-[#1B5E20] transition-colors"
             >
               <Plus className="w-4 h-4" />

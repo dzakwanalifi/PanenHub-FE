@@ -129,8 +129,8 @@ export default function Header() {
               className="relative p-2 text-[#1F2937]"
             >
               <Bell className="w-6 h-6" />
-              <span className={`absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center ${isLoggedIn ? '' : 'hidden'}`}>
-                3
+              <span className={`absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center ${isLoggedIn && useUIStore.getState().notificationCount > 0 ? '' : 'hidden'}`}>
+                {useUIStore.getState().notificationCount}
               </span>
             </button>
             <Link href="/cart" aria-label="View shopping cart" className="relative p-2 text-[#1F2937]">

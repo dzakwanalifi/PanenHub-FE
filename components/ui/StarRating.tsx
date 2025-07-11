@@ -1,4 +1,4 @@
-import { Star, StarHalf } from 'lucide-react';
+import { Star } from 'lucide-react';
 
 interface StarRatingProps {
   rating: number;
@@ -17,7 +17,7 @@ export default function StarRating({ rating, size = 'md', showRating = false }: 
     const stars = [];
     
     for (let i = 0; i < 5; i++) {
-      if (rating >= i + 1) {
+      if (i <= Math.floor(rating)) {
         // Full star
         stars.push(
           <Star
@@ -25,20 +25,30 @@ export default function StarRating({ rating, size = 'md', showRating = false }: 
             className={`${sizeClasses[size]} text-yellow-400 fill-current`}
           />
         );
-      } else if (rating > i) {
+      } else if (i === Math.ceil(rating) && rating % 1 !== 0) {
         // Half star
+        const percentage = ((rating % 1) * 100);
         stars.push(
-          <StarHalf
-            key={i}
-            className={`${sizeClasses[size]} text-yellow-400 fill-current`}
-          />
+          <div key={i} className="relative">
+            <Star
+              className={`${sizeClasses[size]} text-gray-300`}
+            />
+            <div 
+              className="absolute top-0 left-0 overflow-hidden"
+              style={{ width: `${percentage}%` }}
+            >
+              <Star
+                className={`${sizeClasses[size]} text-yellow-400 fill-current`}
+              />
+            </div>
+          </div>
         );
       } else {
         // Empty star
         stars.push(
           <Star
             key={i}
-            className={`${sizeClasses[size]} text-gray-300 stroke-current fill-none`}
+            className={`${sizeClasses[size]} text-gray-300`}
           />
         );
       }

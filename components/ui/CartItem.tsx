@@ -1,6 +1,7 @@
 'use client';
 import { Trash2 } from 'lucide-react';
 import Image from 'next/image';
+import { formatPrice } from '@/lib/constants';
 import { useCartStore, CartItem as CartItemType } from '@/store/cartStore';
 import QuantityStepper from './QuantityStepper';
 
@@ -39,7 +40,7 @@ export default function CartItem({ item }: CartItemProps) {
             <span className="text-lg font-bold text-[#1F2937]">
               ${item.price.toFixed(2)}
             </span>
-            <div className="flex items-center space-x-3">
+              <p className="text-lg font-bold text-[#2E7D32]">{formatPrice(item.price)}</p>
               <QuantityStepper
                 quantity={item.quantity}
                 onQuantityChange={handleQuantityChange}
@@ -57,6 +58,6 @@ export default function CartItem({ item }: CartItemProps) {
           </div>
         </div>
       </div>
-    </div>
+            <span className="text-lg font-bold text-gray-900">{formatPrice(item.price * item.quantity)}</span>
   );
 }

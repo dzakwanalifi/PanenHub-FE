@@ -1,6 +1,5 @@
 'use client';
-import { Utensils, Apple, Wheat, Milk, Fish, Beef } from 'lucide-react';
-import Link from 'next/link';
+import { Utensils, Apple, Wheat, Milk, Fish } from 'lucide-react';
 
 interface CategoriesSectionProps {
   selectedCategory: string;
@@ -9,10 +8,10 @@ interface CategoriesSectionProps {
 
 const categories = [
   { id: 'all', name: 'All', icon: Apple },
-  { id: 'meats', name: 'Meats', icon: Utensils },
-  { id: 'fresh', name: 'Fresh', icon: Apple },
-  { id: 'bakery', name: 'Bakery', icon: Wheat },
-  { id: 'grains', name: 'Grains', icon: Milk },
+  { id: 'vegetables', name: 'Vegetables', icon: Utensils },
+  { id: 'fruits', name: 'Fruits', icon: Apple },
+  { id: 'grains', name: 'Grains', icon: Wheat },
+  { id: 'dairy', name: 'Dairy', icon: Milk },
   { id: 'organic', name: 'Organic', icon: Fish },
 ];
 
@@ -30,7 +29,7 @@ export default function CategoriesSection({ selectedCategory, onCategorySelect }
             >
               <div className={`w-12 h-12 rounded-full flex items-center justify-center transition-colors ${
                 selectedCategory === category.id 
-                  ? 'bg-[#A5D6A7]' 
+                  ? 'bg-[#A5D6A7]'
                   : 'bg-[#F3F4F6]'
               }`}>
                 <category.icon className={`w-6 h-6 ${

@@ -25,9 +25,7 @@ export default function FeaturedProductsSection({ selectedCategory, searchTerm }
   const filteredProducts = mockProducts.filter(product => {
     // Filter by category
     const categoryMatch = selectedCategory === 'all' || 
-      product.category.toLowerCase() === selectedCategory.toLowerCase() ||
-      (selectedCategory === 'fresh' && product.category === 'Vegetables') ||
-      (selectedCategory === 'fresh' && product.category === 'Fruits');
+      product.category.toLowerCase() === selectedCategory.toLowerCase();
     
     // Filter by search term
     const searchMatch = searchTerm === '' || 
