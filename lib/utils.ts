@@ -38,3 +38,21 @@ export const calculateServerSideTotal = (cartItems: CartItem[]): PriceCalculatio
     finalTotal
   };
 };
+
+// Mock distance calculation for hyperlocal features
+export function calculateMockDistance(): number {
+  // Returns a random distance between 0.5 and 5.0 km with one decimal place
+  return Number((Math.random() * 4.5 + 0.5).toFixed(1));
+}
+
+// Calculate distance between two points (mock implementation)
+export function calculateDistanceBetweenPoints(
+  lat1: number,
+  lon1: number,
+  lat2: number,
+  lon2: number
+): number {
+  // For demo purposes, return a mock distance
+  // In real implementation, this would use the Haversine formula
+  return calculateMockDistance();
+}

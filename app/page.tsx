@@ -4,6 +4,7 @@ import HeroSection from '@/components/sections/home/HeroSection';
 import DeliveryModeSelector from '@/components/sections/home/DeliveryModeSelector';
 import CategoriesSection from '@/components/sections/home/CategoriesSection';
 import FeaturedProductsSection from '@/components/sections/home/FeaturedProductsSection';
+import NearbyFreshSection from '@/components/sections/home/NearbyFreshSection';
 import SearchBar from '@/components/ui/SearchBar';
 
 export default function Home() {
@@ -29,6 +30,9 @@ export default function Home() {
         selectedCategory={selectedCategory}
         onCategorySelect={setSelectedCategory}
       />
+      
+      <NearbyFreshSection />
+      
       <FeaturedProductsSection 
         selectedCategory={selectedCategory}
         searchTerm={searchTerm}

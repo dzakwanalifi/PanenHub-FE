@@ -4,43 +4,13 @@ import { ArrowLeft, Plus, MapPin } from 'lucide-react';
 import ProtectedRoute from '@/components/auth/ProtectedRoute';
 import AddressCard from '@/components/ui/AddressCard';
 import Button from '@/components/ui/Button';
+import AddressModal from '@/components/modals/AddressModal';
+import { useAddressStore } from '@/store/addressStore';
 import Link from 'next/link';
 
-interface Address {
-  id: string;
-  name: string;
-  phone: string;
-  street: string;
-  city: string;
-  state: string;
-  zipCode: string;
-  isDefault: boolean;
-}
-
 export default function AddressesPage() {
-  // Mock addresses data
-  const [addresses, setAddresses] = useState<Address[]>([
-    {
-      id: '1',
-      name: 'John Doe',
-      phone: '+1 (555) 123-4567',
-      street: '123 Main Street',
-      city: 'New York',
-      state: 'NY',
-      zipCode: '10001',
-      isDefault: true,
-    },
-    {
-      id: '2',
-      name: 'John Doe',
-      phone: '+1 (555) 123-4567',
-      street: '456 Oak Avenue',
-      city: 'Brooklyn',
-      state: 'NY',
-      zipCode: '11201',
-      isDefault: false,
-    },
-  ]);
+  const { addresses, deleteAddress, setDefaultAddress } = useAddressStore();
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   const handleEditAddress = (id: string) => {
     console.log('Edit address:', id);
@@ -49,15 +19,13 @@ export default function AddressesPage() {
   };
 
   const handleDeleteAddress = (id: string) => {
-    if (confirm('Are you sure you want to delete this address?')) {
-      setAddresses(prev => prev.filter(addr => addr.id !== id));
+    if (confirm('Apakah Anda yakin ingin menghapus alamat ini?')) {
+      deleteAddress(id);
     }
   };
 
   const handleAddNewAddress = () => {
-    console.log('Add new address');
-    // In a real app, this would open an add address modal or navigate to add page
-    alert('Add new address functionality would be implemented here');
+    setIsModalOpen(true);
   };
 
   return (
@@ -69,11 +37,11 @@ export default function AddressesPage() {
             <Link href="/account" className="p-2 hover:bg-gray-100 rounded-lg mr-3">
               <ArrowLeft className="w-5 h-5" />
             </Link>
-            <h1 className="text-2xl md:text-3xl font-bold text-gray-900">Address Book</h1>
+            <h1 className="text-2xl md:text-3xl font-bold text-gray-900">Buku Alamat</h1>
           </div>
           <Button onClick={handleAddNewAddress} className="hidden md:flex">
             <Plus className="w-4 h-4 mr-2" />
-            Add New Address
+            Tambah Alamat Baru
           </Button>
         </div>
 
@@ -84,11 +52,11 @@ export default function AddressesPage() {
               <div className="w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
                 <MapPin className="w-12 h-12 text-gray-400" />
               </div>
-              <h3 className="text-xl font-semibold text-gray-900 mb-2">No addresses saved</h3>
-              <p className="text-gray-600 mb-8">Add your first address to make checkout faster</p>
+              <h3 className="text-xl font-semibold text-gray-900 mb-2">Belum ada alamat tersimpan</h3>
+              <p className="text-gray-600 mb-8">Tambahkan alamat pertama Anda untuk memudahkan checkout</p>
               <Button onClick={handleAddNewAddress} size="lg">
                 <Plus className="w-4 h-4 mr-2" />
-                Add Your First Address
+                Tambah Alamat Pertama
               </Button>
             </div>
           ) : (
@@ -100,6 +68,7 @@ export default function AddressesPage() {
                   address={address}
                   onEdit={handleEditAddress}
                   onDelete={handleDeleteAddress}
+                  onSetDefault={setDefaultAddress}
                 />
               ))}
             </div>
@@ -113,6 +82,12 @@ export default function AddressesPage() {
         >
           <Plus className="w-6 h-6" />
         </button>
+
+        {/* Address Modal */}
+        <AddressModal
+          isOpen={isModalOpen}
+          onClose={() => setIsModalOpen(false)}
+        />
       </div>
     </ProtectedRoute>
   );

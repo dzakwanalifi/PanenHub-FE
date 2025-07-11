@@ -15,9 +15,10 @@ interface AddressCardProps {
   };
   onEdit: (id: string) => void;
   onDelete: (id: string) => void;
+  onSetDefault?: (id: string) => void;
 }
 
-export default function AddressCard({ address, onEdit, onDelete }: AddressCardProps) {
+export default function AddressCard({ address, onEdit, onDelete, onSetDefault }: AddressCardProps) {
   const fullAddress = `${address.street}, ${address.city}, ${address.state} ${address.zipCode}`;
 
   return (
@@ -27,7 +28,7 @@ export default function AddressCard({ address, onEdit, onDelete }: AddressCardPr
           <MapPin className="w-5 h-5 text-[#2E7D32]" />
           <h3 className="text-lg font-semibold text-gray-900">{address.name}</h3>
           {address.isDefault && (
-            <Badge variant="success">Default</Badge>
+            <Badge variant="success">Utama</Badge>
           )}
         </div>
         <div className="flex items-center space-x-2">
@@ -48,7 +49,16 @@ export default function AddressCard({ address, onEdit, onDelete }: AddressCardPr
 
       <div className="space-y-2">
         <p className="text-gray-900">{fullAddress}</p>
-        <p className="text-sm text-gray-600">Phone: {address.phone}</p>
+        <p className="text-sm text-gray-600">Telepon: {address.phone}</p>
+        
+        {!address.isDefault && onSetDefault && (
+          <button
+            onClick={() => onSetDefault(address.id)}
+            className="text-sm text-[#2E7D32] hover:text-[#1B5E20] font-medium"
+          >
+            Jadikan Alamat Utama
+          </button>
+        )}
       </div>
     </div>
   );

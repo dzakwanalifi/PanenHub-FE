@@ -2,6 +2,7 @@
 import { useState } from 'react';
 import { Star, Heart, MessageSquare, Filter, Grid, List } from 'lucide-react';
 import ProductCard from '@/components/ui/ProductCard';
+import StoreLocationMap from './StoreLocationMap';
 import { Store } from '@/lib/store-data';
 
 interface StorePageClientProps {
@@ -111,6 +112,14 @@ export default function StorePageClient({ store }: StorePageClientProps) {
         </div>
       </div>
 
+      {/* Store Location Map */}
+      <div className="mb-8">
+        <StoreLocationMap 
+          storeName={store.name}
+          address={store.location}
+        />
+      </div>
+
       {/* Filters and Sorting */}
       <div className="bg-white rounded-2xl shadow-lg p-6 mb-8">
         <div className="flex flex-col md:flex-row md:items-center md:justify-between space-y-4 md:space-y-0">
@@ -175,16 +184,15 @@ export default function StorePageClient({ store }: StorePageClientProps) {
           : 'grid-cols-1'
       }`}>
         {store.products.map((product) => (
-          <ProductCard
-            key={product.id}
-            id={product.id}
-            name={product.name}
-            price={product.price}
-            image={product.image}
-            rating={product.rating}
-            store={store.name}
-            discount={product.discount}
-          />
+                      <ProductCard
+              key={product.id}
+              id={product.id}
+              name={product.name}
+              price={product.price}
+              image={product.image}
+              rating={product.rating}
+              store={store.name}
+            />
         ))}
       </div>
 
