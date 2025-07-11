@@ -16,42 +16,44 @@ export default function OrderSummary() {
   }
 
   return (
-    <div className="card-flat p-6">
-      <h3 className="text-lg font-semibold text-dark mb-4">Order Summary</h3>
+    <div className="bg-white border border-gray-200 rounded-2xl p-6">
+      <h3 className="text-lg font-semibold text-[#1F2937] mb-4">Order Summary</h3>
       
-      <div className="space-y-3 mb-6">
+      <div className="space-y-3">
         <div className="flex justify-between items-center">
-          <span className="text-gray-600">Subtotal</span>
-          <span className="font-semibold text-dark">${subtotal.toFixed(2)}</span>
+          <span className="text-[#1F2937]">Subtotal</span>
+          <span className="font-semibold text-[#1F2937]">${subtotal.toFixed(2)}</span>
         </div>
         
         <div className="border-t border-dashed border-gray-300 pt-3">
           <div className="flex justify-between items-center">
-            <span className="text-gray-600">Delivery Fee</span>
-            <span className="font-semibold text-dark">${deliveryFee.toFixed(2)}</span>
+            <span className="text-[#1F2937]">Delivery Fee</span>
+            <span className="font-semibold text-[#1F2937]">${deliveryFee.toFixed(2)}</span>
           </div>
         </div>
         
         <div className="border-t border-dashed border-gray-300 pt-3">
           <div className="flex justify-between items-center">
-            <span className="text-gray-600">Discount</span>
-            <span className="font-semibold text-[#A5D6A7]">5%</span>
+            <span className="text-[#1F2937]">Discount</span>
+            <span className="font-semibold text-green-600">-${discount.toFixed(2)}</span>
           </div>
         </div>
         
         <div className="border-t border-dashed border-gray-300 pt-3">
           <div className="flex justify-between items-center text-lg">
-            <span className="font-semibold text-dark">Total</span>
-            <span className="font-bold text-dark">${total.toFixed(2)}</span>
+            <span className="font-bold text-[#1F2937]">Total</span>
+            <span className="font-bold text-[#1F2937]">${total.toFixed(2)}</span>
           </div>
         </div>
       </div>
 
-      <Link href="/checkout">
-        <Button className="w-full" size="lg">
-          Buy Now
-        </Button>
-      </Link>
+      <div className="mt-6">
+        <Link href="/checkout">
+          <Button className="w-full" size="lg">
+            Buy Now
+          </Button>
+        </Link>
+      </div>
     </div>
   );
 }

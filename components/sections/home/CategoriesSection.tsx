@@ -20,10 +20,10 @@ export default function CategoriesSection() {
               className="flex flex-col items-center space-y-2 cursor-pointer"
               onClick={() => console.log('Category clicked:', category.name)}
             >
-              <div className="w-12 h-12 bg-light rounded-full flex items-center justify-center">
-                <category.icon className="w-6 h-6 text-dark" />
+              <div className="w-12 h-12 bg-[#F3F4F6] rounded-full flex items-center justify-center">
+                <category.icon className="w-6 h-6 text-[#1F2937]" />
               </div>
-              <span className="text-sm font-medium text-dark">{category.name}</span>
+              <span className="text-sm font-medium text-[#1F2937]">{category.name}</span>
             </div>
           ))}
         </div>

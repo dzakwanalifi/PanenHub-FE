@@ -16,11 +16,11 @@ export default function MobileTabBar() {
   }, []);
 
   const tabs = [
-    { icon: Home, label: 'Home', href: '/', iconFilled: Home },
-    { icon: Users, label: 'Patungan', href: '/group-buy', iconFilled: Users },
-    { icon: ShoppingCart, label: 'Cart', href: '/cart', badge: itemCount, iconFilled: ShoppingCart },
-    { icon: ScrollText, label: 'Orders', href: '/orders', iconFilled: ScrollText },
-    { icon: User, label: 'Account', href: '/account', iconFilled: User },
+    { icon: Home, label: 'Home', href: '/' },
+    { icon: Users, label: 'Patungan', href: '/group-buy' },
+    { icon: ShoppingCart, label: 'Cart', href: '/cart', badge: itemCount },
+    { icon: ScrollText, label: 'Orders', href: '/orders' },
+    { icon: User, label: 'Account', href: '/account' },
   ];
 
   return (
@@ -28,7 +28,7 @@ export default function MobileTabBar() {
       <div className="grid grid-cols-5 py-3">
         {tabs.map((tab) => {
           const isActive = pathname === tab.href;
-          const IconComponent = isActive ? tab.iconFilled : tab.icon;
+          const IconComponent = tab.icon;
           return (
             <div
               key={tab.href}
@@ -39,19 +39,19 @@ export default function MobileTabBar() {
                 className="flex flex-col items-center py-2 px-3 transition-colors"
               >
                 <div className={`relative p-2 rounded-full transition-colors ${
-                  isActive ? 'bg-[#A5D6A7]' : ''
+                  isActive ? 'bg-[#A5D6A7]' : 'bg-transparent'
                 }`}>
-                  <IconComponent className={`w-6 h-6 ${
-                    isActive ? 'text-white' : 'text-gray-500'
+                  <IconComponent className={`w-5 h-5 ${
+                    isActive ? 'text-white' : 'text-[#1F2937]'
                   }`} />
-                </div>
-                {tab.badge !== undefined && (
-                  <span className={`absolute -top-1 -right-1 bg-[#A5D6A7] text-white text-xs rounded-full w-5 h-5 flex items-center justify-center ${tab.badge > 0 ? '' : 'hidden'}`}>
+                  {tab.badge !== undefined && tab.badge > 0 && (
+                    <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-4 h-4 flex items-center justify-center">
                     {tab.badge}
                   </span>
-                )}
+                  )}
+                </div>
                 <span className={`text-xs mt-1 ${
-                  isActive ? 'text-[#A5D6A7] font-medium' : 'text-gray-500'
+                  isActive ? 'text-[#A5D6A7] font-medium' : 'text-[#1F2937]'
                 }`}>{tab.label}</span>
               </Link>
             </div>

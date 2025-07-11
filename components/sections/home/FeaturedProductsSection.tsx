@@ -75,7 +75,7 @@ export default function FeaturedProductsSection() {
   return (
     <section className="px-4">
       <div className="flex items-center justify-between mb-6">
-        <h2 className="text-xl font-bold text-dark">Popular items</h2>
+        <h2 className="text-xl font-bold text-[#1F2937]">Popular items</h2>
         <button className="text-[#A5D6A7] font-semibold hover:underline">
           View All
         </button>
