@@ -4,6 +4,7 @@ import { Star, Heart, Share2 } from 'lucide-react';
 import Image from 'next/image';
 import { useCartStore } from '@/store/cartStore';
 import QuantityStepper from '@/components/ui/QuantityStepper';
+import StarRating from '@/components/ui/StarRating';
 import Link from 'next/link';
 import { Product } from '@/lib/product-data';
 
@@ -103,19 +104,7 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
 
           {/* Rating */}
           <div className="flex items-center space-x-2">
-            <div className="flex items-center">
-              {[...Array(5)].map((_, i) => (
-                <Star
-                  key={i}
-                  className={`w-5 h-5 ${
-                    i < Math.floor(product.rating)
-                      ? 'text-[#FFC107] fill-current'
-                      : 'text-gray-300'
-                  }`}
-                />
-              ))}
-            </div>
-            <span className="text-gray-600">({product.rating})</span>
+            <StarRating rating={product.rating} size="lg" showRating={true} />
           </div>
 
           {/* Price */}

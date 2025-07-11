@@ -1,5 +1,6 @@
 'use client';
 import { Minus, Plus, Trash2 } from 'lucide-react';
+import Image from 'next/image';
 import { useCartStore, CartItem as CartItemType } from '@/store/cartStore';
 import { formatPrice } from '@/lib/constants';
 
@@ -20,9 +21,11 @@ export default function CartItem({ item }: CartItemProps) {
 
   return (
     <div className="bg-white rounded-2xl shadow-lg p-4 flex items-center space-x-4">
-      <img
+      <Image
         src={item.image}
         alt={item.name}
+        width={80}
+        height={80}
         className="w-20 h-20 object-cover rounded-lg"
       />
       

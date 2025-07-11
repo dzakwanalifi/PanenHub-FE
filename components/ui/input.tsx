@@ -1,4 +1,5 @@
-import React from 'react';
+import React, { useState } from 'react';
+import { Eye, EyeOff } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
@@ -13,9 +14,12 @@ export default function Input({
   helperText,
   className,
   id,
+  type,
   ...props
 }: InputProps) {
+  const [showPassword, setShowPassword] = useState(false);
   const inputId = id || `input-${Math.random().toString(36).substr(2, 9)}`;
+  const isPassword = type === 'password';
   
   return (
     <div className="space-y-2">
@@ -24,15 +28,28 @@ export default function Input({
           {label}
         </label>
       )}
-      <input
-        id={inputId}
-        className={cn(
-          'w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#2E7D32] focus:border-transparent transition-colors',
-          error && 'border-red-500 focus:ring-red-500',
-          className
+      <div className="relative">
+        <input
+          id={inputId}
+          type={isPassword ? (showPassword ? 'text' : 'password') : type}
+          className={cn(
+            'w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#2E7D32] focus:border-transparent transition-colors',
+            error && 'border-red-500 focus:ring-red-500',
+            isPassword && 'pr-12',
+            className
+          )}
+          {...props}
+        />
+        {isPassword && (
+          <button
+            type="button"
+            onClick={() => setShowPassword(!showPassword)}
+            className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700"
+          >
+            {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+          </button>
         )}
-        {...props}
-      />
+      </div>
       {error && (
         <p className="text-sm text-red-600">{error}</p>
       )}

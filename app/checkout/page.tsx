@@ -10,6 +10,7 @@ import Button from '@/components/ui/Button';
 import Input from '@/components/ui/Input';
 import Card from '@/components/ui/Card';
 import PaymentModal from '@/components/ui/PaymentModal';
+import Image from 'next/image';
 import Link from 'next/link';
 
 export default function CheckoutPage() {
@@ -189,7 +190,7 @@ export default function CheckoutPage() {
         <div className="space-y-4 mb-6">
           {items.map((item) => (
             <div key={item.cartItemId} className="flex items-center space-x-4 p-4 bg-gray-50 rounded-lg">
-              <img src={item.image} alt={item.name} className="w-16 h-16 object-cover rounded-lg" />
+              <Image src={item.image} alt={item.name} width={64} height={64} className="w-16 h-16 object-cover rounded-lg" />
               <div className="flex-1">
                 <h3 className="font-semibold text-gray-900">{item.name}</h3>
                 <p className="text-sm text-gray-600">{item.store}</p>
