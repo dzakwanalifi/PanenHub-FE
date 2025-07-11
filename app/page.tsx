@@ -1,16 +1,37 @@
 'use client';
+import { useState } from 'react';
 import ClientOnly from '@/components/ClientOnly';
 import HeroSection from '@/components/sections/home/HeroSection';
 import CategoriesSection from '@/components/sections/home/CategoriesSection';
 import FeaturedProductsSection from '@/components/sections/home/FeaturedProductsSection';
+import SearchBar from '@/components/ui/SearchBar';
 
 export default function Home() {
+  const [selectedCategory, setSelectedCategory] = useState('all');
+  const [searchTerm, setSearchTerm] = useState('');
+
   return (
     <ClientOnly>
       <div className="space-y-8">
         <HeroSection />
-        <CategoriesSection />
-        <FeaturedProductsSection />
+        
+        {/* Search Bar */}
+        <div className="px-4">
+          <SearchBar 
+            searchTerm={searchTerm}
+            onSearchChange={setSearchTerm}
+            placeholder="Search for fresh produce..."
+          />
+        </div>
+        
+        <CategoriesSection 
+          selectedCategory={selectedCategory}
+          onCategorySelect={setSelectedCategory}
+        />
+        <FeaturedProductsSection 
+          selectedCategory={selectedCategory}
+          searchTerm={searchTerm}
+        />
       </div>
     </ClientOnly>
   );
