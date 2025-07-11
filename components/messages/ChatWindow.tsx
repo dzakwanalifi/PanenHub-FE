@@ -1,6 +1,7 @@
 'use client';
 import { useState } from 'react';
 import { ArrowLeft, Phone, Video, MoreVertical, Send } from 'lucide-react';
+import { useAuthStore } from '@/store/authStore';
 import ChatMessage from './ChatMessage';
 
 interface ChatWindowProps {
@@ -13,67 +14,47 @@ interface ChatWindowProps {
       isOnline: boolean;
     };
   };
+  messages?: Array<{
+    id: string;
+    text: string;
+    timestamp: string;
+    senderId: string;
+  }>;
   onBack: () => void;
-}
-
-interface Message {
-  id: string;
-  text: string;
-  timestamp: string;
-  isFromCurrentUser: boolean;
-  avatar?: string;
 }
 
 export default function ChatWindow({ conversation, onBack }: ChatWindowProps) {
   const [message, setMessage] = useState('');
+  const [localMessages, setLocalMessages] = useState<Array<{
+    id: string;
+    text: string;
+    timestamp: string;
+    senderId: string;
+  }>>([]);
+  const { user } = useAuthStore();
 
-  // Mock messages data
-  const messages: Message[] = [
-    {
-      id: '1',
-      text: 'Hi! I\'m interested in your organic carrots. Are they still available?',
-      timestamp: '10:30 AM',
-      isFromCurrentUser: true,
-    },
-    {
-      id: '2',
-      text: 'Hello! Yes, we have fresh organic carrots available. How many kilograms would you like?',
-      timestamp: '10:32 AM',
-      isFromCurrentUser: false,
-      avatar: conversation.otherUser.avatar,
-    },
-    {
-      id: '3',
-      text: 'I\'d like to order 5kg. When can you deliver?',
-      timestamp: '10:35 AM',
-      isFromCurrentUser: true,
-    },
-    {
-      id: '4',
-      text: 'Perfect! We can deliver tomorrow morning between 8-10 AM. The total would be $14.95 for 5kg.',
-      timestamp: '10:37 AM',
-      isFromCurrentUser: false,
-      avatar: conversation.otherUser.avatar,
-    },
-    {
-      id: '5',
-      text: 'That sounds great! I\'ll place the order now.',
-      timestamp: '10:40 AM',
-      isFromCurrentUser: true,
-    },
-    {
-      id: '6',
-      text: 'Your order has been prepared and will be shipped tomorrow!',
-      timestamp: '2 min ago',
-      isFromCurrentUser: false,
-      avatar: conversation.otherUser.avatar,
-    },
-  ];
+  // Combine original messages with local messages
+  const allMessages = [
+    ...(conversation.messages || []),
+    ...localMessages
+  ].map(msg => ({
+    ...msg,
+    isFromCurrentUser: msg.senderId === user?.id,
+    avatar: msg.senderId !== user?.id ? conversation.otherUser.avatar : undefined
+  }));
 
   const handleSendMessage = (e: React.FormEvent) => {
     e.preventDefault();
     if (message.trim()) {
-      console.log('Sending message:', message);
+      // Add message to local state
+      const newMessage = {
+        id: `local-${Date.now()}`,
+        text: message.trim(),
+        timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+        senderId: user?.id || ''
+      };
+      
+      setLocalMessages(prev => [...prev, newMessage]);
       setMessage('');
     }
   };
@@ -123,7 +104,7 @@ export default function ChatWindow({ conversation, onBack }: ChatWindowProps) {
 
       {/* Messages */}
       <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-gray-50">
-        {messages.map((msg) => (
+        {allMessages.map((msg) => (
           <ChatMessage key={msg.id} message={msg} />
         ))}
       </div>

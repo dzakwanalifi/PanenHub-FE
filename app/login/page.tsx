@@ -1,17 +1,42 @@
 'use client';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import { Eye, EyeOff } from 'lucide-react';
 import Link from 'next/link';
+import { useAuthStore } from '@/store/authStore';
+import Button from '@/components/ui/Button';
+import Input from '@/components/ui/Input';
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+  
+  const { login, isLoggedIn } = useAuthStore();
+  const router = useRouter();
+  
+  useEffect(() => {
+    if (isLoggedIn) {
+      router.push('/');
+    }
+  }, [isLoggedIn, router]);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log('Login attempt:', { email, password });
-    // TODO: Implement login logic
+    setLoading(true);
+    setError('');
+    
+    const result = await login(email, password);
+    
+    if (result.success) {
+      router.push('/');
+    } else {
+      setError(result.error || 'Login failed');
+    }
+    
+    setLoading(false);
   };
 
   return (
@@ -23,25 +48,17 @@ export default function LoginPage() {
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-6">
-          <div>
-            <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
-              Email Address
-            </label>
-            <input
-              type="email"
-              id="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#2E7D32] focus:border-transparent"
-              placeholder="Enter your email"
-              required
-            />
-          </div>
+          <Input
+            type="email"
+            label="Email Address"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            placeholder="Enter your email"
+            required
+          />
 
           <div>
-            <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-2">
-              Password
-            </label>
+            <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-2">Password</label>
             <div className="relative">
               <input
                 type={showPassword ? 'text' : 'password'}
@@ -62,6 +79,10 @@ export default function LoginPage() {
             </div>
           </div>
 
+          {error && (
+            <div className="text-red-600 text-sm">{error}</div>
+          )}
+
           <div className="flex items-center justify-between">
             <label className="flex items-center">
               <input type="checkbox" className="rounded border-gray-300 text-[#2E7D32] focus:ring-[#2E7D32]" />
@@ -72,13 +93,21 @@ export default function LoginPage() {
             </Link>
           </div>
 
-          <button
+          <Button
             type="submit"
-            className="w-full bg-[#2E7D32] text-white py-3 px-4 rounded-lg font-semibold hover:bg-[#1B5E20] transition-colors"
+            className="w-full"
+            size="lg"
+            loading={loading}
           >
             Sign In
-          </button>
+          </Button>
         </form>
+
+        <div className="mt-6 p-4 bg-gray-50 rounded-lg">
+          <p className="text-sm text-gray-600 mb-2">Demo accounts:</p>
+          <p className="text-xs text-gray-500">john.doe@example.com (Buyer)</p>
+          <p className="text-xs text-gray-500">sarah.johnson@example.com (Seller)</p>
+        </div>
 
         <div className="mt-8 text-center">
           <p className="text-gray-600">

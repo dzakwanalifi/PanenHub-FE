@@ -1,7 +1,11 @@
 'use client';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import { Eye, EyeOff } from 'lucide-react';
 import Link from 'next/link';
+import { useAuthStore } from '@/store/authStore';
+import Button from '@/components/ui/Button';
+import Input from '@/components/ui/Input';
 
 export default function SignUpPage() {
   const [name, setName] = useState('');
@@ -10,15 +14,38 @@ export default function SignUpPage() {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+  
+  const { register, isLoggedIn } = useAuthStore();
+  const router = useRouter();
+  
+  useEffect(() => {
+    if (isLoggedIn) {
+      router.push('/');
+    }
+  }, [isLoggedIn, router]);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setError('');
+    
     if (password !== confirmPassword) {
-      alert('Passwords do not match');
+      setError('Passwords do not match');
       return;
     }
-    console.log('Sign up attempt:', { name, email, password });
-    // TODO: Implement sign up logic
+    
+    setLoading(true);
+    
+    const result = await register(name, email, password);
+    
+    if (result.success) {
+      router.push('/');
+    } else {
+      setError(result.error || 'Registration failed');
+    }
+    
+    setLoading(false);
   };
 
   return (
@@ -30,40 +57,26 @@ export default function SignUpPage() {
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-6">
-          <div>
-            <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-2">
-              Full Name
-            </label>
-            <input
-              type="text"
-              id="name"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#2E7D32] focus:border-transparent"
-              placeholder="Enter your full name"
-              required
-            />
-          </div>
+          <Input
+            type="text"
+            label="Full Name"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            placeholder="Enter your full name"
+            required
+          />
+
+          <Input
+            type="email"
+            label="Email Address"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            placeholder="Enter your email"
+            required
+          />
 
           <div>
-            <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
-              Email Address
-            </label>
-            <input
-              type="email"
-              id="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#2E7D32] focus:border-transparent"
-              placeholder="Enter your email"
-              required
-            />
-          </div>
-
-          <div>
-            <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-2">
-              Password
-            </label>
+            <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-2">Password</label>
             <div className="relative">
               <input
                 type={showPassword ? 'text' : 'password'}
@@ -108,6 +121,10 @@ export default function SignUpPage() {
             </div>
           </div>
 
+          {error && (
+            <div className="text-red-600 text-sm">{error}</div>
+          )}
+
           <div>
             <label className="flex items-center">
               <input type="checkbox" className="rounded border-gray-300 text-[#2E7D32] focus:ring-[#2E7D32]" required />
@@ -124,12 +141,14 @@ export default function SignUpPage() {
             </label>
           </div>
 
-          <button
+          <Button
             type="submit"
-            className="w-full bg-[#2E7D32] text-white py-3 px-4 rounded-lg font-semibold hover:bg-[#1B5E20] transition-colors"
+            className="w-full"
+            size="lg"
+            loading={loading}
           >
             Create Account
-          </button>
+          </Button>
         </form>
 
         <div className="mt-8 text-center">

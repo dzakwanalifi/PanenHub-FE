@@ -1,21 +1,30 @@
 'use client';
 import { useState, useEffect } from 'react';
-import { Leaf, ShoppingCart, Search, Menu, X, Bell, MessageSquare } from 'lucide-react';
+import { Leaf, ShoppingCart, Search, Menu, X, Bell, MessageSquare, User, LogOut } from 'lucide-react';
 import { useCartStore } from '@/store/cartStore';
+import { useAuthStore } from '@/store/authStore';
 import SearchBar from '../ui/SearchBar';
 import NotificationPanel from '../notifications/NotificationPanel';
 import ClientOnly from '../ClientOnly';
 import Link from 'next/link';
+import Avatar from '../ui/Avatar';
 
 export default function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isNotificationOpen, setIsNotificationOpen] = useState(false);
+  const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
   const [hasMounted, setHasMounted] = useState(false);
   const itemCount = useCartStore((state) => state.getItemCount());
+  const { isLoggedIn, user, logout } = useAuthStore();
 
   useEffect(() => {
     setHasMounted(true);
   }, []);
+
+  const handleLogout = () => {
+    logout();
+    setIsUserMenuOpen(false);
+  };
 
   return (
     <header className="sticky top-0 z-50 bg-white border-b border-gray-200 shadow-sm">
@@ -36,19 +45,18 @@ export default function Header() {
 
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center space-x-4">
-            <Link href="/messages" className="p-2 text-gray-600 hover:text-[#2E7D32] transition-colors">
-              <MessageSquare className="w-6 h-6" />
-            </Link>
-            <Link href="/messages" className="p-2 text-gray-600 hover:text-[#2E7D32] transition-colors">
-              <MessageSquare className="w-6 h-6" />
-            </Link>
+            {isLoggedIn && (
+              <Link href="/messages" className="p-2 text-gray-600 hover:text-[#2E7D32] transition-colors">
+                <MessageSquare className="w-6 h-6" />
+              </Link>
+            )}
             <div className="relative">
               <button
                 onClick={() => setIsNotificationOpen(!isNotificationOpen)}
                 className="relative p-2 text-gray-600 hover:text-[#2E7D32] transition-colors"
               >
                 <Bell className="w-6 h-6" />
-                <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
+                <span className={`absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center ${isLoggedIn ? '' : 'hidden'}`}>
                   3
                 </span>
               </button>
@@ -62,22 +70,67 @@ export default function Header() {
                 {itemCount}
               </span>
             </Link>
-            <Link href="/login" className="bg-[#2E7D32] text-white px-4 py-2 rounded-lg hover:bg-[#1B5E20] transition-colors">
-              Login / Sign Up
-            </Link>
+            
+            {isLoggedIn ? (
+              <div className="relative">
+                <button
+                  onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
+                  className="flex items-center space-x-2 p-2 rounded-lg hover:bg-gray-100 transition-colors"
+                >
+                  <Avatar src={user?.avatar} alt={user?.name} size="sm" fallback={user?.name} />
+                  <span className="text-sm font-medium text-gray-700">{user?.name}</span>
+                </button>
+                
+                {isUserMenuOpen && (
+                  <div className="absolute right-0 top-full mt-2 w-48 bg-white rounded-2xl shadow-lg border border-gray-200 py-2">
+                    <Link
+                      href="/account"
+                      onClick={() => setIsUserMenuOpen(false)}
+                      className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                    >
+                      <User className="w-4 h-4 mr-2" />
+                      My Account
+                    </Link>
+                    {user?.isSeller && (
+                      <Link
+                        href="/dashboard/mystore"
+                        onClick={() => setIsUserMenuOpen(false)}
+                        className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                      >
+                        <ShoppingCart className="w-4 h-4 mr-2" />
+                        My Store
+                      </Link>
+                    )}
+                    <button
+                      onClick={handleLogout}
+                      className="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                    >
+                      <LogOut className="w-4 h-4 mr-2" />
+                      Logout
+                    </button>
+                  </div>
+                )}
+              </div>
+            ) : (
+              <Link href="/login" className="bg-[#2E7D32] text-white px-4 py-2 rounded-lg hover:bg-[#1B5E20] transition-colors">
+                Login / Sign Up
+              </Link>
+            )}
           </div>
 
           {/* Mobile Menu Button */}
           <div className="md:hidden flex items-center space-x-2">
-            <Link href="/messages" className="p-2 text-gray-600">
-              <MessageSquare className="w-6 h-6" />
-            </Link>
+            {isLoggedIn && (
+              <Link href="/messages" className="p-2 text-gray-600">
+                <MessageSquare className="w-6 h-6" />
+              </Link>
+            )}
             <button
               onClick={() => setIsNotificationOpen(!isNotificationOpen)}
               className="relative p-2 text-gray-600"
             >
               <Bell className="w-6 h-6" />
-              <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
+              <span className={`absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center ${isLoggedIn ? '' : 'hidden'}`}>
                 3
               </span>
             </button>
@@ -106,9 +159,43 @@ export default function Header() {
       {isMenuOpen && (
         <div className="md:hidden bg-white border-t border-gray-200 p-4">
           <div className="space-y-2">
-            <Link href="/login" className="block w-full bg-[#2E7D32] text-white px-4 py-2 rounded-lg text-center">
-              Login / Sign Up
-            </Link>
+            {isLoggedIn ? (
+              <div className="space-y-2">
+                <div className="flex items-center space-x-3 p-3 bg-gray-50 rounded-lg">
+                  <Avatar src={user?.avatar} alt={user?.name} size="sm" fallback={user?.name} />
+                  <div>
+                    <p className="font-medium text-gray-900">{user?.name}</p>
+                    <p className="text-sm text-gray-600">{user?.email}</p>
+                  </div>
+                </div>
+                <Link
+                  href="/account"
+                  onClick={() => setIsMenuOpen(false)}
+                  className="block w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-lg"
+                >
+                  My Account
+                </Link>
+                {user?.isSeller && (
+                  <Link
+                    href="/dashboard/mystore"
+                    onClick={() => setIsMenuOpen(false)}
+                    className="block w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-lg"
+                  >
+                    My Store
+                  </Link>
+                )}
+                <button
+                  onClick={handleLogout}
+                  className="block w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-lg"
+                >
+                  Logout
+                </button>
+              </div>
+            ) : (
+              <Link href="/login" className="block w-full bg-[#2E7D32] text-white px-4 py-2 rounded-lg text-center">
+                Login / Sign Up
+              </Link>
+            )}
           </div>
         </div>
       )}
