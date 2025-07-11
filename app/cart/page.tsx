@@ -13,15 +13,15 @@ export default function CartPage() {
       <div className="container mx-auto px-4 py-8">
         <div className="text-center max-w-md mx-auto">
           <ShoppingBag className="w-24 h-24 text-gray-300 mx-auto mb-4" />
-          <h1 className="text-2xl font-bold text-[#1F2937] mb-2">Your cart is empty</h1>
+          <h1 className="text-2xl font-bold text-[#1F2937] mb-2">Keranjang Anda kosong</h1>
           <p className="text-gray-500 mb-8">
-            Looks like you haven't added any items to your cart yet.
+            Sepertinya Anda belum menambahkan produk apapun ke keranjang.
           </p>
           <Link
             href="/"
             className="bg-[#A5D6A7] text-[#1F2937] px-8 py-3 rounded-full font-semibold hover:bg-[#B9E4C9] transition-colors"
           >
-            Continue Shopping
+            Lanjut Belanja
           </Link>
         </div>
       </div>
@@ -30,7 +30,7 @@ export default function CartPage() {
 
   return (
     <div className="container mx-auto px-4 py-8">
-      <h1 className="text-2xl md:text-3xl font-bold text-[#1F2937] mb-8 text-center">Cart</h1>
+      <h1 className="text-2xl md:text-3xl font-bold text-[#1F2937] mb-8 text-center">Keranjang</h1>
       
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 pb-32 md:pb-8">
         {/* Cart Items */}

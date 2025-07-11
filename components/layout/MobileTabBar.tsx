@@ -38,11 +38,11 @@ export default function MobileTabBar() {
   };
 
   const tabs = [
-    { icon: Home, label: 'Home', href: '/' },
+    { icon: Home, label: 'Beranda', href: '/' },
     { icon: Users, label: 'Patungan', href: '/group-buy' },
     null, // Placeholder for central sell button
-    { icon: ScrollText, label: 'Orders', href: '/orders' },
-    { icon: User, label: 'Account', href: '/account' },
+    { icon: ScrollText, label: 'Transaksi', href: '/orders' },
+    { icon: User, label: 'Akun', href: '/account' },
   ];
 
   return (
@@ -61,7 +61,7 @@ export default function MobileTabBar() {
                   >
                     <Plus className="w-7 h-7 text-white" />
                   </button>
-                  <span className="text-xs mt-1 text-[#A5D6A7] font-medium">Sell</span>
+                  <span className="text-xs mt-1 text-[#A5D6A7] font-medium">Jual</span>
                 </div>
               );
             }
@@ -89,7 +89,7 @@ export default function MobileTabBar() {
                     </div>
                     <span className={`text-xs mt-1 ${
                       isActive ? 'text-[#A5D6A7] font-medium' : 'text-[#1F2937]'
-                    }`}>Cart</span>
+                    }`}>Keranjang</span>
                   </Link>
                 </div>
               );

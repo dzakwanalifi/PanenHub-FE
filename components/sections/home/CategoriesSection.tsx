@@ -7,12 +7,12 @@ interface CategoriesSectionProps {
 }
 
 const categories = [
-  { id: 'all', name: 'All', icon: Apple },
-  { id: 'vegetables', name: 'Vegetables', icon: Utensils },
-  { id: 'fruits', name: 'Fruits', icon: Apple },
-  { id: 'grains', name: 'Grains', icon: Wheat },
-  { id: 'dairy', name: 'Dairy', icon: Milk },
-  { id: 'organic', name: 'Organic', icon: Fish },
+  { id: 'all', name: 'Semua', icon: Apple },
+  { id: 'vegetables', name: 'Sayuran', icon: Utensils },
+  { id: 'fruits', name: 'Buah-buahan', icon: Apple },
+  { id: 'grains', name: 'Biji-bijian', icon: Wheat },
+  { id: 'dairy', name: 'Susu & Olahan', icon: Milk },
+  { id: 'organic', name: 'Organik', icon: Fish },
 ];
 
 export default function CategoriesSection({ selectedCategory, onCategorySelect }: CategoriesSectionProps) {

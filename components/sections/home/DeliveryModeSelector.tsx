@@ -21,7 +21,7 @@ export default function DeliveryModeSelector() {
         >
           <MapPin className="w-4 h-4 text-[#1F2937]" />
           <div className="text-left">
-            <p className="text-xs text-gray-500">Delivery to</p>
+            <p className="text-xs text-gray-500">Diantar ke</p>
             <p className="text-sm font-semibold text-[#1F2937]">{currentLocation.name}</p>
           </div>
         </button>
@@ -38,7 +38,7 @@ export default function DeliveryModeSelector() {
             }`}
           >
             <Truck className="w-3 h-3" />
-            <span>Delivery</span>
+            <span>Diantar</span>
           </button>
           <button
             onClick={() => setDeliveryMode('pickup')}
@@ -50,7 +50,7 @@ export default function DeliveryModeSelector() {
             }`}
           >
             <MapPin className="w-3 h-3" />
-            <span>Pickup</span>
+            <span>Ambil Sendiri</span>
           </button>
         </div>
       </div>

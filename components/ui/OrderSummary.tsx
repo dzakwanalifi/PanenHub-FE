@@ -17,7 +17,7 @@ export default function OrderSummary() {
 
   return (
     <div className="bg-white rounded-2xl shadow-lg p-6">
-      <h3 className="text-lg font-semibold text-[#1F2937] mb-4">Order Summary</h3>
+      <h3 className="text-lg font-semibold text-[#1F2937] mb-4">Ringkasan Pesanan</h3>
       
       <div className="space-y-3">
         <div className="flex justify-between items-center">
@@ -27,16 +27,16 @@ export default function OrderSummary() {
         
         <div className="border-t border-dashed border-gray-300 pt-3">
           <div className="flex justify-between items-center">
-            <span className="text-[#1F2937]">Shipping</span>
+            <span className="text-[#1F2937]">Biaya Kirim</span>
             <span className="font-semibold text-[#1F2937]">
-              {priceData.shipping === 0 ? 'Free' : formatPrice(priceData.shipping)}
+              {priceData.shipping === 0 ? 'Gratis' : formatPrice(priceData.shipping)}
             </span>
           </div>
         </div>
         
         <div className="border-t border-dashed border-gray-300 pt-3">
           <div className="flex justify-between items-center">
-            <span className="text-[#1F2937]">Discount</span>
+            <span className="text-[#1F2937]">Diskon</span>
             <span className="font-semibold text-green-600">-{formatPrice(priceData.discount)}</span>
           </div>
         </div>
@@ -52,7 +52,7 @@ export default function OrderSummary() {
       <div className="mt-6">
         <Link href="/checkout">
           <Button className="w-full" size="lg">
-            Proceed to Checkout
+            Lanjut ke Pembayaran
           </Button>
         </Link>
       </div>

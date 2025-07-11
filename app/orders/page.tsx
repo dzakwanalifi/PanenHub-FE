@@ -43,15 +43,15 @@ export default function OrdersPage() {
   const getStatusText = (status: string) => {
     switch (status) {
       case 'delivered':
-        return 'Delivered';
+        return 'Diterima';
       case 'shipped':
-        return 'Shipped';
+        return 'Dikirim';
       case 'processing':
-        return 'Processing';
+        return 'Diproses';
       case 'cancelled':
-        return 'Cancelled';
+        return 'Dibatalkan';
       default:
-        return 'Unknown';
+        return 'Tidak Diketahui';
     }
   };
 
@@ -59,18 +59,18 @@ export default function OrdersPage() {
     <ProtectedRoute>
       <div className="container mx-auto px-4 py-8">
         <div className="mb-8">
-          <h1 className="text-2xl md:text-3xl font-bold text-gray-900 mb-2">My Orders</h1>
-          <p className="text-gray-600">Track and manage your order history</p>
+          <h1 className="text-2xl md:text-3xl font-bold text-gray-900 mb-2">Pesanan Saya</h1>
+          <p className="text-gray-600">Lacak dan kelola riwayat pesanan Anda</p>
         </div>
 
         {orders.length === 0 ? (
           <div className="text-center max-w-md mx-auto">
             <Package className="w-24 h-24 text-gray-300 mx-auto mb-4" />
-            <h2 className="text-xl font-bold text-gray-900 mb-2">No orders yet</h2>
+            <h2 className="text-xl font-bold text-gray-900 mb-2">Belum ada pesanan</h2>
             <p className="text-gray-600 mb-8">
-              You haven't placed any orders yet. Start shopping to see your orders here.
+              Anda belum melakukan pesanan apapun. Mulai belanja untuk melihat pesanan di sini.
             </p>
-            <Button size="lg">Start Shopping</Button>
+            <Button size="lg">Mulai Belanja</Button>
           </div>
         ) : (
           <div className="space-y-6">

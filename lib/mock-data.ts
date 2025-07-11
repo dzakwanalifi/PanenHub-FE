@@ -86,10 +86,10 @@ export interface MockConversation {
 export const mockProducts: MockProduct[] = [
   {
     id: '1',
-    name: 'Organic Carrots',
+    name: 'Wortel Organik',
     price: 2.99,
     originalPrice: 3.32,
-    description: 'Fresh, organic carrots grown without pesticides. Perfect for salads, cooking, or snacking. Rich in beta-carotene and vitamins.',
+    description: 'Wortel organik segar yang ditanam tanpa pestisida. Sempurna untuk salad, masakan, atau camilan. Kaya beta-karoten dan vitamin.',
     images: [
       'https://images.unsplash.com/photo-1445282768818-728615cc910a?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
       'https://images.unsplash.com/photo-1582515073490-39981397c445?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80'
@@ -97,14 +97,14 @@ export const mockProducts: MockProduct[] = [
     storeId: 'store1',
     rating: 4.5,
     reviewCount: 124,
-    category: 'Vegetables',
+    category: 'Sayuran',
     inStock: true
   },
   {
     id: '2',
-    name: 'Fresh Spinach',
+    name: 'Bayam Segar',
     price: 3.49,
-    description: 'Nutrient-dense fresh spinach leaves, perfect for salads, smoothies, and cooking. Packed with iron and vitamins.',
+    description: 'Daun bayam segar yang kaya nutrisi, sempurna untuk salad, smoothie, dan masakan. Kaya zat besi dan vitamin.',
     images: [
       'https://images.unsplash.com/photo-1576045057995-568f588f82fb?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
       'https://images.unsplash.com/photo-1515543237350-b3eea1ec8082?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80'
@@ -112,15 +112,15 @@ export const mockProducts: MockProduct[] = [
     storeId: 'store2',
     rating: 4.8,
     reviewCount: 89,
-    category: 'Vegetables',
+    category: 'Sayuran',
     inStock: true
   },
   {
     id: '3',
-    name: 'Red Bell Peppers',
+    name: 'Paprika Merah',
     price: 4.99,
     originalPrice: 5.87,
-    description: 'Crisp and sweet red bell peppers, perfect for cooking, grilling, or eating raw. Rich in vitamin C and antioxidants.',
+    description: 'Paprika merah yang renyah dan manis, sempurna untuk masakan, dipanggang, atau dimakan mentah. Kaya vitamin C dan antioksidan.',
     images: [
       'https://images.unsplash.com/photo-1563565375-f3fdfdbefa83?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
       'https://images.unsplash.com/photo-1525607551316-4a8e16d1f9ba?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80'
@@ -128,14 +128,14 @@ export const mockProducts: MockProduct[] = [
     storeId: 'store1',
     rating: 4.6,
     reviewCount: 156,
-    category: 'Vegetables',
+    category: 'Sayuran',
     inStock: true
   },
   {
     id: '4',
-    name: 'Organic Tomatoes',
+    name: 'Tomat Organik',
     price: 3.99,
-    description: 'Juicy organic tomatoes grown without chemicals. Perfect for salads, sauces, and cooking.',
+    description: 'Tomat organik yang segar dan berair, ditanam tanpa bahan kimia. Sempurna untuk salad, saus, dan masakan.',
     images: [
       'https://images.unsplash.com/photo-1546470427-e5380e0e4a36?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
       'https://images.unsplash.com/photo-1592924357228-91a4daadcfea?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80'
@@ -143,14 +143,14 @@ export const mockProducts: MockProduct[] = [
     storeId: 'store3',
     rating: 4.7,
     reviewCount: 203,
-    category: 'Vegetables',
+    category: 'Sayuran',
     inStock: true
   },
   {
     id: '5',
-    name: 'Fresh Broccoli',
+    name: 'Brokoli Segar',
     price: 2.79,
-    description: 'Fresh broccoli crowns packed with nutrients. Great for steaming, roasting, or adding to stir-fries.',
+    description: 'Brokoli segar yang kaya nutrisi. Sangat baik untuk dikukus, dipanggang, atau ditambahkan ke tumisan.',
     images: [
       'https://images.unsplash.com/photo-1459411621453-7b03977f4bfc?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
       'https://images.unsplash.com/photo-1628773822503-930a7eaecf80?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80'

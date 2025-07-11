@@ -5,16 +5,23 @@
 // -----------------------------------------------------------------------------
 // Currency & Localization
 // -----------------------------------------------------------------------------
-export const CURRENCY_SYMBOL = '$';
-export const CURRENCY_CODE = 'USD';
-export const LOCALE = 'en-US';
+export const CURRENCY_SYMBOL = 'Rp';
+export const CURRENCY_CODE = 'IDR';
+export const LOCALE = 'id-ID';
 
-// Currency formatting with proper localization
+// Currency formatting with proper Indonesian localization
 export const formatPrice = (price: number): string => {
   return new Intl.NumberFormat(LOCALE, {
     style: 'currency',
     currency: CURRENCY_CODE,
-  }).format(price);
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 0,
+  }).format(price * 1000); // Convert to proper IDR scale
+};
+
+// Alternative formatting for simple display
+export const formatCurrency = (amount: number): string => {
+  return `Rp ${(amount * 1000).toLocaleString('id-ID')}`;
 };
 
 export const formatPriceRange = (minPrice: number, maxPrice: number): string => {
@@ -26,7 +33,7 @@ export const formatPriceRange = (minPrice: number, maxPrice: number): string => 
 // -----------------------------------------------------------------------------
 export const APP_CONFIG = {
   name: 'PanenHub',
-  description: 'Fresh produce marketplace connecting farmers and consumers',
+  description: 'Marketplace hasil panen segar yang menghubungkan petani dan konsumen',
   version: '1.0.0',
   
   // Pagination
@@ -39,14 +46,14 @@ export const APP_CONFIG = {
   maxImageSize: 5 * 1024 * 1024, // 5MB
   maxImagesPerProduct: 5,
   
-  // Thresholds
+  // Thresholds (in IDR thousands)
   freeShippingThreshold: 50.00,
   minimumOrderAmount: 5.00,
   maximumOrderAmount: 1000.00,
   
   // Contact
   supportEmail: 'support@panenhub.com',
-  businessWhatsApp: '+1234567890',
+  businessWhatsApp: '+62812345678',
 } as const;
 
 // -----------------------------------------------------------------------------
@@ -73,29 +80,29 @@ export const COLORS = {
 export const VALIDATION = {
   email: {
     pattern: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
-    message: 'Please enter a valid email address',
+    message: 'Masukkan alamat email yang valid',
   },
   phone: {
     pattern: /^\+?[\d\s\-\(\)]+$/,
     minLength: 10,
     maxLength: 15,
-    message: 'Please enter a valid phone number',
+    message: 'Masukkan nomor telepon yang valid',
   },
   password: {
     minLength: 8,
     pattern: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/,
-    message: 'Password must be at least 8 characters with uppercase, lowercase, and number',
+    message: 'Password minimal 8 karakter dengan huruf besar, kecil, dan angka',
   },
   name: {
     minLength: 2,
     maxLength: 50,
     pattern: /^[a-zA-Z\s]+$/,
-    message: 'Name must contain only letters and spaces',
+    message: 'Nama hanya boleh berisi huruf dan spasi',
   },
   price: {
     min: 0.01,
     max: 9999.99,
-    message: 'Price must be between $0.01 and $9,999.99',
+    message: 'Harga harus antara Rp 10 dan Rp 9.999.990',
   },
 } as const;
 
@@ -179,19 +186,19 @@ export const formatSlug = (text: string): string => {
 // Status & Badge Configurations
 // -----------------------------------------------------------------------------
 export const ORDER_STATUS = {
-  pending: { label: 'Pending', color: COLORS.warning, bgColor: '#FEF3C7' },
-  confirmed: { label: 'Confirmed', color: COLORS.info, bgColor: '#DBEAFE' },
-  processing: { label: 'Processing', color: COLORS.info, bgColor: '#DBEAFE' },
-  shipped: { label: 'Shipped', color: COLORS.primary, bgColor: '#D1FAE5' },
-  delivered: { label: 'Delivered', color: COLORS.success, bgColor: '#D1FAE5' },
-  cancelled: { label: 'Cancelled', color: COLORS.error, bgColor: '#FEE2E2' },
+  pending: { label: 'Menunggu', color: COLORS.warning, bgColor: '#FEF3C7' },
+  confirmed: { label: 'Dikonfirmasi', color: COLORS.info, bgColor: '#DBEAFE' },
+  processing: { label: 'Diproses', color: COLORS.info, bgColor: '#DBEAFE' },
+  shipped: { label: 'Dikirim', color: COLORS.primary, bgColor: '#D1FAE5' },
+  delivered: { label: 'Diterima', color: COLORS.success, bgColor: '#D1FAE5' },
+  cancelled: { label: 'Dibatalkan', color: COLORS.error, bgColor: '#FEE2E2' },
 } as const;
 
 export const PAYMENT_STATUS = {
-  pending: { label: 'Pending', color: COLORS.warning },
-  paid: { label: 'Paid', color: COLORS.success },
-  failed: { label: 'Failed', color: COLORS.error },
-  refunded: { label: 'Refunded', color: COLORS.info },
+  pending: { label: 'Menunggu', color: COLORS.warning },
+  paid: { label: 'Lunas', color: COLORS.success },
+  failed: { label: 'Gagal', color: COLORS.error },
+  refunded: { label: 'Dikembalikan', color: COLORS.info },
 } as const;
 
 // -----------------------------------------------------------------------------

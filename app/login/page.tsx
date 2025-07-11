@@ -36,17 +36,17 @@ export default function LoginPage() {
     <div className="min-h-screen flex items-center justify-center px-4">
       <div className="max-w-md w-full bg-white rounded-2xl shadow-lg p-8">
         <div className="text-center mb-8">
-          <h1 className="text-2xl font-bold text-gray-900 mb-2">Welcome Back!</h1>
-          <p className="text-gray-600">Sign in to your PanenHub account</p>
+          <h1 className="text-2xl font-bold text-gray-900 mb-2">Selamat Datang Kembali!</h1>
+          <p className="text-gray-600">Masuk ke akun PanenHub Anda</p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-6">
           <Input
             type="email"
-            label="Email Address"
+            label="Alamat Email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            placeholder="Enter your email"
+            placeholder="Masukkan email Anda"
             required
           />
 
@@ -55,7 +55,7 @@ export default function LoginPage() {
             label="Password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            placeholder="Enter your password"
+            placeholder="Masukkan password Anda"
             required
           />
 
@@ -66,10 +66,10 @@ export default function LoginPage() {
           <div className="flex items-center justify-between">
             <label className="flex items-center">
               <input type="checkbox" className="rounded border-gray-300 text-[#2E7D32] focus:ring-[#2E7D32]" />
-              <span className="ml-2 text-sm text-gray-600">Remember me</span>
+              <span className="ml-2 text-sm text-gray-600">Ingat saya</span>
             </label>
             <Link href="/forgot-password" className="text-sm text-[#2E7D32] hover:underline">
-              Forgot password?
+              Lupa password?
             </Link>
           </div>
 
@@ -79,21 +79,21 @@ export default function LoginPage() {
             size="lg"
             loading={isLoading}
           >
-            Sign In
+            Masuk
           </Button>
         </form>
 
         <div className="mt-6 p-4 bg-gray-50 rounded-lg">
-          <p className="text-sm text-gray-600 mb-2">Demo accounts:</p>
-          <p className="text-xs text-gray-500">john.doe@example.com (Buyer)</p>
-          <p className="text-xs text-gray-500">sarah.johnson@example.com (Seller)</p>
+          <p className="text-sm text-gray-600 mb-2">Akun demo:</p>
+          <p className="text-xs text-gray-500">john.doe@example.com (Pembeli)</p>
+          <p className="text-xs text-gray-500">sarah.johnson@example.com (Penjual)</p>
         </div>
 
         <div className="mt-8 text-center">
           <p className="text-gray-600">
-            Don't have an account?{' '}
+            Belum punya akun?{' '}
             <Link href="/signup" className="text-[#2E7D32] font-semibold hover:underline">
-              Sign up
+              Daftar
             </Link>
           </p>
         </div>

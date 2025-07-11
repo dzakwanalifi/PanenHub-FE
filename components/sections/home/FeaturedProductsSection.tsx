@@ -37,15 +37,15 @@ export default function FeaturedProductsSection({ selectedCategory, searchTerm }
   return (
     <section className="px-4">
       <div className="flex items-center justify-between mb-6">
-        <h2 className="text-xl font-bold text-[#1F2937]">Popular items</h2>
+        <h2 className="text-xl font-bold text-[#1F2937]">Produk Populer</h2>
         <button className="text-[#A5D6A7] font-semibold hover:underline">
-          View All
+          Lihat Semua
         </button>
       </div>
       
       {filteredProducts.length === 0 ? (
         <div className="text-center py-8">
-          <p className="text-gray-500">No products found matching your criteria.</p>
+          <p className="text-gray-500">Tidak ada produk yang sesuai dengan kriteria Anda.</p>
         </div>
       ) : (
         <div className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">

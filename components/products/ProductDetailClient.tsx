@@ -7,6 +7,7 @@ import { useFavoriteStore } from '@/store/favoriteStore';
 import QuantityStepper from '@/components/ui/QuantityStepper';
 import StarRating from '@/components/ui/StarRating';
 import Link from 'next/link';
+import { formatPrice } from '@/lib/constants';
 import { Product } from '@/lib/product-data';
 
 interface ProductDetailClientProps {
@@ -38,7 +39,7 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
   const handleShare = async () => {
     const shareData = {
       title: product.name,
-      text: `Check out this ${product.name} from ${product.store} on PanenHub!`,
+      text: `Lihat ${product.name} dari ${product.store} di PanenHub!`,
       url: window.location.href,
     };
 
@@ -60,17 +61,17 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
   const handleFallbackShare = () => {
     const url = window.location.href;
     navigator.clipboard.writeText(url).then(() => {
-      alert('Link copied to clipboard!');
+      alert('Link berhasil disalin ke clipboard!');
     }).catch(() => {
       // Final fallback - just alert the URL
-      alert(`Share this product: ${url}`);
+      alert(`Bagikan produk ini: ${url}`);
     });
   };
 
   return (
     <div className="container mx-auto px-4 py-8">
       {/* Centered Page Title */}
-      <h1 className="text-2xl md:text-3xl font-bold text-[#1F2937] mb-8 text-center">Product Details</h1>
+      <h1 className="text-2xl md:text-3xl font-bold text-[#1F2937] mb-8 text-center">Detail Produk</h1>
       
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         {/* Product Image Gallery */}
@@ -127,13 +128,13 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
                 href={`/store/${product.store.toLowerCase().replace(/\s+/g, '-')}`}
                 className="text-sm text-gray-500 hover:text-[#A5D6A7] transition-colors"
               >
-                Visit Store
+                Kunjungi Toko
               </Link>
               <button
                 onClick={() => console.log('Chat with seller')}
                 className="text-sm bg-[#A5D6A7] text-[#1F2937] px-3 py-1 rounded-full hover:bg-[#B9E4C9] transition-colors"
               >
-                Chat with Seller
+                Chat dengan Penjual
               </button>
             </div>
           </div>
@@ -151,19 +152,19 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
 
           {/* Description */}
           <div>
-            <h3 className="text-lg font-semibold text-[#1F2937] mb-2">Description</h3>
+            <h3 className="text-lg font-semibold text-[#1F2937] mb-2">Deskripsi</h3>
             <p className="text-gray-500">{product.description}</p>
           </div>
 
           {/* Product Details */}
           <div>
-            <h3 className="text-lg font-semibold text-[#1F2937] mb-2">Product Details</h3>
+            <h3 className="text-lg font-semibold text-[#1F2937] mb-2">Detail Produk</h3>
             <p className="text-gray-500">{product.details}</p>
           </div>
 
           {/* Quantity Selector */}
           <div>
-            <h3 className="text-lg font-semibold text-[#1F2937] mb-3">Quantity</h3>
+            <h3 className="text-lg font-semibold text-[#1F2937] mb-3">Jumlah</h3>
             <QuantityStepper
               quantity={quantity}
               onQuantityChange={setQuantity}
@@ -175,7 +176,7 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
           <div className="flex items-center space-x-4">
             <button
               onClick={() => toggleFavorite(product.id)}
-              aria-label={isFavorite ? "Remove from favorites" : "Add to favorites"}
+              aria-label={isFavorite ? "Hapus dari favorit" : "Tambah ke favorit"}
               className={`p-3 rounded-lg border transition-colors ${
                 isFavorite
                   ? 'border-red-500 text-red-500 bg-red-50'
@@ -187,7 +188,7 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
             
             <button 
               onClick={handleShare}
-              aria-label="Share product" 
+              aria-label="Bagikan produk" 
               className="p-3 rounded-lg border border-gray-300 text-[#1F2937] hover:bg-gray-50 transition-colors"
             >
               <Share2 className="w-6 h-6" />
@@ -202,7 +203,7 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
           onClick={handleAddToCart}
           className="w-full bg-[#A5D6A7] text-[#1F2937] py-4 rounded-full text-lg font-semibold hover:bg-[#B9E4C9] transition-colors"
         >
-          Add to Cart - ${(product.price * quantity).toFixed(2)}
+          Tambah ke Keranjang - {formatPrice(product.price * quantity)}
         </button>
       </div>
 
@@ -212,7 +213,7 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
           onClick={handleAddToCart}
           className="bg-[#A5D6A7] text-[#1F2937] px-8 py-4 rounded-full text-lg font-semibold hover:bg-[#B9E4C9] transition-colors"
         >
-          Add to Cart - ${(product.price * quantity).toFixed(2)}
+          Tambah ke Keranjang - {formatPrice(product.price * quantity)}
         </button>
       </div>
     </div>

@@ -21,7 +21,7 @@ export default function Home() {
         <SearchBar 
           searchTerm={searchTerm}
           onSearchChange={setSearchTerm}
-          placeholder="Search for fresh produce..."
+          placeholder="Cari produk segar..."
         />
       </div>
       

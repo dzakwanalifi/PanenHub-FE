@@ -87,7 +87,7 @@ export default function Header() {
                       className="flex items-center px-4 py-2 text-sm text-[#1F2937] hover:bg-[#F3F4F6]"
                     >
                       <User className="w-4 h-4 mr-2" />
-                      My Account
+                      Akun Saya
                     </Link>
                     {user?.isSeller && (
                       <Link
@@ -96,7 +96,7 @@ export default function Header() {
                         className="flex items-center px-4 py-2 text-sm text-[#1F2937] hover:bg-[#F3F4F6]"
                       >
                         <ShoppingCart className="w-4 h-4 mr-2" />
-                        My Store
+                        Toko Saya
                       </Link>
                     )}
                     <button
@@ -104,14 +104,14 @@ export default function Header() {
                       className="flex items-center w-full px-4 py-2 text-sm text-[#1F2937] hover:bg-[#F3F4F6]"
                     >
                       <LogOut className="w-4 h-4 mr-2" />
-                      Logout
+                      Keluar
                     </button>
                   </div>
                 )}
               </div>
             ) : (
               <Link href="/login" className="btn-primary">
-                Login / Sign Up
+                Masuk / Daftar
               </Link>
             )}
           </div>
@@ -124,7 +124,7 @@ export default function Header() {
               </Link>
             )}
             <button
-              onClick={() => setIsNotificationOpen(!isNotificationOpen)}
+              onClick={() => setActiveOverlay(activeOverlay === 'notifications' ? 'none' : 'notifications')}
               aria-label="View notifications"
               className="relative p-2 text-[#1F2937]"
             >
@@ -169,7 +169,7 @@ export default function Header() {
                   onClick={closeAllOverlays}
                   className="block w-full text-left px-4 py-2 text-[#1F2937] hover:bg-[#F3F4F6] rounded-lg"
                 >
-                  My Account
+                  Akun Saya
                 </Link>
                 {user?.isSeller && (
                   <Link
@@ -177,19 +177,19 @@ export default function Header() {
                     onClick={closeAllOverlays}
                     className="block w-full text-left px-4 py-2 text-[#1F2937] hover:bg-[#F3F4F6] rounded-lg"
                   >
-                    My Store
+                    Toko Saya
                   </Link>
                 )}
                 <button
                   onClick={handleLogout}
                   className="block w-full text-left px-4 py-2 text-[#1F2937] hover:bg-[#F3F4F6] rounded-lg"
                 >
-                  Logout
+                  Keluar
                 </button>
               </div>
             ) : (
               <Link href="/login" className="block w-full bg-[#A5D6A7] text-[#1F2937] px-4 py-2 rounded-full text-center font-semibold">
-                Login / Sign Up
+                Masuk / Daftar
               </Link>
             )}
           </div>

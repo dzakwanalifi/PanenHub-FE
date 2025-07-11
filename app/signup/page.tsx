@@ -29,7 +29,7 @@ export default function SignUpPage() {
     clearError();
     
     if (password !== confirmPassword) {
-      setLocalError('Passwords do not match');
+      setLocalError('Password tidak cocok');
       return;
     }
     
@@ -45,26 +45,26 @@ export default function SignUpPage() {
     <div className="min-h-screen flex items-center justify-center px-4">
       <div className="max-w-md w-full bg-white rounded-2xl shadow-lg p-8">
         <div className="text-center mb-8">
-          <h1 className="text-2xl font-bold text-gray-900 mb-2">Create Account</h1>
-          <p className="text-gray-600">Join PanenHub for fresh produce delivery</p>
+          <h1 className="text-2xl font-bold text-gray-900 mb-2">Buat Akun</h1>
+          <p className="text-gray-600">Bergabung dengan PanenHub untuk produk segar</p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-6">
           <Input
             type="text"
-            label="Full Name"
+            label="Nama Lengkap"
             value={name}
             onChange={(e) => setName(e.target.value)}
-            placeholder="Enter your full name"
+            placeholder="Masukkan nama lengkap Anda"
             required
           />
 
           <Input
             type="email"
-            label="Email Address"
+            label="Alamat Email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            placeholder="Enter your email"
+            placeholder="Masukkan email Anda"
             required
           />
 
@@ -73,16 +73,16 @@ export default function SignUpPage() {
             label="Password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            placeholder="Create a password"
+            placeholder="Buat password"
             required
           />
 
           <Input
             type="password"
-            label="Confirm Password"
+            label="Konfirmasi Password"
             value={confirmPassword}
             onChange={(e) => setConfirmPassword(e.target.value)}
-            placeholder="Confirm your password"
+            placeholder="Konfirmasi password Anda"
             required
           />
 
@@ -94,13 +94,13 @@ export default function SignUpPage() {
             <label className="flex items-center">
               <input type="checkbox" className="rounded border-gray-300 text-[#2E7D32] focus:ring-[#2E7D32]" required />
               <span className="ml-2 text-sm text-gray-600">
-                I agree to the{' '}
+                Saya setuju dengan{' '}
                 <Link href="/terms" className="text-[#2E7D32] hover:underline">
-                  Terms of Service
+                  Syarat Layanan
                 </Link>{' '}
-                and{' '}
+                dan{' '}
                 <Link href="/privacy" className="text-[#2E7D32] hover:underline">
-                  Privacy Policy
+                  Kebijakan Privasi
                 </Link>
               </span>
             </label>
@@ -112,15 +112,15 @@ export default function SignUpPage() {
             size="lg"
             loading={isLoading}
           >
-            Create Account
+            Buat Akun
           </Button>
         </form>
 
         <div className="mt-8 text-center">
           <p className="text-gray-600">
-            Already have an account?{' '}
+            Sudah punya akun?{' '}
             <Link href="/login" className="text-[#2E7D32] font-semibold hover:underline">
-              Sign in
+              Masuk
             </Link>
           </p>
         </div>

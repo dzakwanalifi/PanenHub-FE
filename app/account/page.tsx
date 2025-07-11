@@ -18,7 +18,7 @@ export default function AccountPage() {
   return (
     <ProtectedRoute>
       <div className="container mx-auto px-4 py-8">
-        <h1 className="text-2xl md:text-3xl font-bold text-gray-900 mb-8">My Account</h1>
+        <h1 className="text-2xl md:text-3xl font-bold text-gray-900 mb-8">Akun Saya</h1>
         
         {/* User Profile Header */}
         <div className="bg-white rounded-2xl shadow-lg p-6 mb-8">
@@ -30,8 +30,8 @@ export default function AccountPage() {
               fallback={user?.name}
             />
             <div>
-              <h2 className="text-xl font-bold text-gray-900">Welcome, {user?.name}</h2>
-              <p className="text-gray-600">Member since {user?.joinDate}</p>
+              <h2 className="text-xl font-bold text-gray-900">Selamat datang, {user?.name}</h2>
+              <p className="text-gray-600">Bergabung sejak {user?.joinDate}</p>
               <p className="text-sm text-gray-500">{user?.email}</p>
             </div>
           </div>
@@ -40,24 +40,24 @@ export default function AccountPage() {
         <div className="space-y-8">
           {/* My Account Section */}
           <div>
-            <h3 className="text-xl font-bold text-gray-900 mb-4">My Account</h3>
+            <h3 className="text-xl font-bold text-gray-900 mb-4">Akun Saya</h3>
             <div className="space-y-4">
               <MenuItem
                 icon={User}
-                title="Profile Settings"
-                description="Update your name, photo, and personal info"
+                title="Pengaturan Profil"
+                description="Perbarui nama, foto, dan informasi pribadi Anda"
                 href="/account/profile"
               />
               <MenuItem
                 icon={BookMarked}
-                title="Address Book"
-                description="Manage your shipping and pickup locations"
+                title="Buku Alamat"
+                description="Kelola alamat pengiriman dan pickup Anda"
                 href="/account/addresses"
               />
               <MenuItem
                 icon={CreditCard}
-                title="Payment Methods"
-                description="Manage your saved payment options"
+                title="Metode Pembayaran"
+                description="Kelola opsi pembayaran tersimpan Anda"
                 href="/account/payment"
               />
             </div>
@@ -65,12 +65,12 @@ export default function AccountPage() {
 
           {/* My Orders Section */}
           <div>
-            <h3 className="text-xl font-bold text-gray-900 mb-4">My Orders</h3>
+            <h3 className="text-xl font-bold text-gray-900 mb-4">Pesanan Saya</h3>
             <div className="space-y-4">
               <MenuItem
                 icon={History}
-                title="Order History"
-                description="Track your current and past purchases"
+                title="Riwayat Pesanan"
+                description="Lacak pembelian saat ini dan masa lalu"
                 href="/orders"
               />
             </div>
@@ -79,18 +79,18 @@ export default function AccountPage() {
           {/* Seller Tools Section */}
           {user?.isSeller && (
             <div>
-              <h3 className="text-xl font-bold text-gray-900 mb-4">Seller Tools</h3>
+              <h3 className="text-xl font-bold text-gray-900 mb-4">Alat Penjual</h3>
               <div className="space-y-4">
                 <MenuItem
                   icon={LayoutDashboard}
-                  title="My Store Dashboard"
-                  description="Manage your store and products"
+                  title="Dashboard Toko Saya"
+                  description="Kelola toko dan produk Anda"
                   href="/dashboard/mystore"
                 />
                 <MenuItem
                   icon={Store}
-                  title="Store Settings"
-                  description="Configure your store profile and settings"
+                  title="Pengaturan Toko"
+                  description="Konfigurasi profil dan pengaturan toko Anda"
                   href="/dashboard/settings"
                 />
               </div>
@@ -100,18 +100,18 @@ export default function AccountPage() {
           {/* Become a Seller Section */}
           {!user?.isSeller && (
             <div>
-              <h3 className="text-xl font-bold text-gray-900 mb-4">Become a Seller</h3>
+              <h3 className="text-xl font-bold text-gray-900 mb-4">Menjadi Penjual</h3>
               <div className="bg-gradient-to-br from-[#2E7D32] to-[#1B5E20] text-white rounded-2xl p-8 text-center">
                 <div className="w-16 h-16 bg-white bg-opacity-20 rounded-full flex items-center justify-center mx-auto mb-4">
                   <Store className="w-8 h-8 text-white" />
                 </div>
-                <h3 className="text-2xl font-bold mb-2">Open Your Store for Free</h3>
-                <p className="text-green-100 mb-6">Start selling your products and reach thousands of customers</p>
+                <h3 className="text-2xl font-bold mb-2">Buka Toko Gratis</h3>
+                <p className="text-green-100 mb-6">Mulai jual produk Anda dan jangkau ribuan pelanggan</p>
                 <button
                   onClick={() => console.log('Navigate to seller registration')}
                   className="bg-white text-[#2E7D32] px-8 py-3 rounded-lg font-semibold hover:bg-gray-100 transition-colors"
                 >
-                  Get Started
+                  Mulai Sekarang
                 </button>
               </div>
             </div>
@@ -119,18 +119,18 @@ export default function AccountPage() {
 
           {/* App Settings Section */}
           <div>
-            <h3 className="text-xl font-bold text-gray-900 mb-4">App Settings</h3>
+            <h3 className="text-xl font-bold text-gray-900 mb-4">Pengaturan Aplikasi</h3>
             <div className="space-y-4">
               <MenuItem
                 icon={Bell}
-                title="Notification Settings"
-                description="Choose what updates you want to receive"
+                title="Pengaturan Notifikasi"
+                description="Pilih pembaruan yang ingin Anda terima"
                 href="/account/notifications"
               />
               <MenuItem
                 icon={Shield}
-                title="Security"
-                description="Change your password and manage account security"
+                title="Keamanan"
+                description="Ubah password dan kelola keamanan akun"
                 href="/account/security"
               />
             </div>
@@ -140,8 +140,8 @@ export default function AccountPage() {
           <div className="pt-4">
             <MenuItem
               icon={LogOut}
-              title="Logout"
-              description="Sign out of your account"
+              title="Keluar"
+              description="Keluar dari akun Anda"
               href="#"
               onClick={handleLogout}
             />

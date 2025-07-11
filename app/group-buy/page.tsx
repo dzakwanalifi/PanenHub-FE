@@ -7,27 +7,27 @@ export default function GroupBuyPage() {
   return (
     <div className="container mx-auto px-4 py-8">
       <div className="mb-8">
-        <h1 className="text-2xl md:text-3xl font-bold text-gray-900 mb-2">Group Buy</h1>
-        <p className="text-gray-600">Join group purchases to get better prices on bulk orders</p>
+        <h1 className="text-2xl md:text-3xl font-bold text-gray-900 mb-2">Patungan</h1>
+        <p className="text-gray-600">Bergabung dalam pembelian kelompok untuk harga lebih baik</p>
       </div>
 
       {/* How it works section */}
       <div className="bg-white rounded-2xl shadow-lg p-6 mb-8">
-        <h2 className="text-xl font-semibold text-gray-900 mb-4">How Group Buy Works</h2>
+        <h2 className="text-xl font-semibold text-gray-900 mb-4">Cara Kerja Patungan</h2>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div className="text-center">
             <div className="w-12 h-12 bg-[#2E7D32] bg-opacity-10 rounded-lg flex items-center justify-center mx-auto mb-3">
               <Users className="w-6 h-6 text-[#2E7D32]" />
             </div>
-            <h3 className="font-semibold text-gray-900 mb-2">Join a Group</h3>
-            <p className="text-sm text-gray-600">Find products you want and join other buyers</p>
+            <h3 className="font-semibold text-gray-900 mb-2">Gabung Grup</h3>
+            <p className="text-sm text-gray-600">Temukan produk yang Anda inginkan dan bergabung dengan pembeli lain</p>
           </div>
           <div className="text-center">
             <div className="w-12 h-12 bg-[#2E7D32] bg-opacity-10 rounded-lg flex items-center justify-center mx-auto mb-3">
               <TrendingUp className="w-6 h-6 text-[#2E7D32]" />
             </div>
-            <h3 className="font-semibold text-gray-900 mb-2">Reach Target</h3>
-            <p className="text-sm text-gray-600">Wait for enough people to join the group</p>
+            <h3 className="font-semibold text-gray-900 mb-2">Capai Target</h3>
+            <p className="text-sm text-gray-600">Tunggu hingga cukup orang bergabung dalam grup</p>
           </div>
           <div className="text-center">
             <div className="w-12 h-12 bg-[#2E7D32] bg-opacity-10 rounded-lg flex items-center justify-center mx-auto mb-3">

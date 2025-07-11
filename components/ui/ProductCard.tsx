@@ -68,40 +68,40 @@ export default function ProductCard({ id, name, price, originalPrice, image, rat
             className="object-cover group-hover:scale-105 transition-transform duration-300"
             sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
           />
-          {discountPercentage > 0 && (
-            <div className="p-4">
-              <h3 className="text-lg font-semibold text-[#1F2937] mb-1 line-clamp-2">
-                {name}
-              </h3>
-              
-              <p className="text-sm text-gray-500 mb-2">{store}</p>
-              
-              <div className="flex items-center space-x-2 mb-2">
-                <StarRating rating={rating} size="sm" />
-                <span className="text-xs text-gray-500">({rating})</span>
-              </div>
-              
-              <div className="flex items-center justify-between">
-                <span className="text-lg font-bold text-[#1F2937]">
-                  ${price.toFixed(2)}
-                </span>
-                {hasDiscount && (
-                  <span className="text-sm text-gray-500 line-through">
-                    -{discountPercentage}%
-                  </span>
-                )}
-                <span className="text-lg font-bold text-[#1F2937]">{formatPrice(price)}</span>
-                <button
-                  onClick={handleAddToCart}
-                  className="bg-[#2E7D32] text-white p-2 rounded-lg hover:bg-[#1B5E20] transition-colors"
-                >
-                  <Plus className="w-4 h-4" />
-                </button>
-              </div>
-            </div>
-          )}
+
         </div>
       </Link>
+
+      <div className="p-4">
+        <h3 className="text-lg font-semibold text-[#1F2937] mb-1 line-clamp-2">
+          {name}
+        </h3>
+        
+        <p className="text-sm text-gray-500 mb-2">{store}</p>
+        
+        <div className="flex items-center space-x-2 mb-2">
+          <StarRating rating={rating} size="sm" />
+          <span className="text-xs text-gray-500">({rating})</span>
+        </div>
+        
+        <div className="flex items-center justify-between">
+          <div className="flex flex-col">
+            <span className="text-lg font-bold text-[#1F2937]">{formatPrice(price)}</span>
+            {hasDiscount && (
+              <span className="text-sm text-gray-500 line-through">
+                {formatPrice(originalPrice)}
+              </span>
+            )}
+          </div>
+          <button
+            onClick={handleAddToCart}
+            className="bg-[#2E7D32] text-white p-2 rounded-lg hover:bg-[#1B5E20] transition-colors"
+            aria-label="Tambah ke keranjang"
+          >
+            <Plus className="w-4 h-4" />
+          </button>
+        </div>
+      </div>
     </div>
   );
 }

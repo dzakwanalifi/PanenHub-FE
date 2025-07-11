@@ -20,16 +20,16 @@ export default function HeroSection() {
       <div className="relative z-10 flex items-center justify-center h-full px-4">
         <div className="text-center text-white max-w-2xl">
           <h1 className="text-4xl md:text-6xl font-bold mb-6 leading-tight">
-            Fresh Harvest, Delivered to Your Doorstep
+            Hasil Panen Segar, Diantar ke Rumah Anda
           </h1>
           <p className="text-lg md:text-xl mb-8 text-gray-200">
-            Discover the finest organic produce from local farms, delivered fresh daily to your home.
+            Temukan produk organik terbaik dari petani lokal, diantar segar setiap hari ke rumah Anda.
           </p>
           <Link
             href="/products"
             className="inline-flex items-center bg-[#A5D6A7] text-[#1F2937] px-8 py-4 rounded-full text-lg font-semibold hover:bg-[#B9E4C9] transition-colors"
           >
-            Shop All Products
+            Belanja Sekarang
             <ArrowRight className="w-5 h-5 ml-2" />
           </Link>
         </div>
