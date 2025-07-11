@@ -64,10 +64,10 @@ export default function FeaturedProductsSection({ selectedCategory, searchTerm }
                 id={product.id}
                 name={product.name}
                 price={product.price}
+                originalPrice={product.originalPrice}
                 image={product.images[0]}
                 rating={product.rating}
-                store={mockProducts.find(p => p.storeId === product.storeId)?.name || 'Unknown Store'}
-                discount={product.discount}
+                store={mockStores.find(s => s.id === product.storeId)?.name || 'Unknown Store'}
               />
             ))
           )}

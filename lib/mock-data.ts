@@ -88,6 +88,7 @@ export const mockProducts: MockProduct[] = [
     id: '1',
     name: 'Organic Carrots',
     price: 2.99,
+    originalPrice: 3.32,
     description: 'Fresh, organic carrots grown without pesticides. Perfect for salads, cooking, or snacking. Rich in beta-carotene and vitamins.',
     images: [
       'https://images.unsplash.com/photo-1445282768818-728615cc910a?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
@@ -97,8 +98,7 @@ export const mockProducts: MockProduct[] = [
     rating: 4.5,
     reviewCount: 124,
     category: 'Vegetables',
-    inStock: true,
-    discount: 10
+    inStock: true
   },
   {
     id: '2',
@@ -119,6 +119,7 @@ export const mockProducts: MockProduct[] = [
     id: '3',
     name: 'Red Bell Peppers',
     price: 4.99,
+    originalPrice: 5.87,
     description: 'Crisp and sweet red bell peppers, perfect for cooking, grilling, or eating raw. Rich in vitamin C and antioxidants.',
     images: [
       'https://images.unsplash.com/photo-1563565375-f3fdfdbefa83?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
@@ -128,8 +129,7 @@ export const mockProducts: MockProduct[] = [
     rating: 4.6,
     reviewCount: 156,
     category: 'Vegetables',
-    inStock: true,
-    discount: 15
+    inStock: true
   },
   {
     id: '4',
@@ -165,6 +165,7 @@ export const mockProducts: MockProduct[] = [
     id: '6',
     name: 'Sweet Corn',
     price: 1.99,
+    originalPrice: 2.49,
     description: 'Sweet, tender corn on the cob. Perfect for grilling, boiling, or adding to salads and soups.',
     images: [
       'https://images.unsplash.com/photo-1551754655-cd27e38d2076?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
@@ -174,8 +175,7 @@ export const mockProducts: MockProduct[] = [
     rating: 4.8,
     reviewCount: 145,
     category: 'Vegetables',
-    inStock: true,
-    discount: 20
+    inStock: true
   },
   {
     id: '7',
@@ -226,6 +226,7 @@ export const mockProducts: MockProduct[] = [
     id: '10',
     name: 'Organic Apples',
     price: 4.49,
+    originalPrice: 5.10,
     description: 'Crisp organic apples with natural sweetness. Great for snacking, baking, or making juice.',
     images: [
       'https://images.unsplash.com/photo-1560806887-1e4cd0b6cbd6?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
@@ -235,8 +236,7 @@ export const mockProducts: MockProduct[] = [
     rating: 4.6,
     reviewCount: 178,
     category: 'Fruits',
-    inStock: true,
-    discount: 12
+    inStock: true
   }
 ];
 
