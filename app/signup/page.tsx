@@ -33,12 +33,13 @@ export default function SignUpPage() {
       return;
     }
     
-    const result = await register(name, email, password);
-    
-    if (result.success) {
-      router.push('/');
+    try {
+      await register({ name, email, password });
+      // Jika berhasil, user akan diarahkan otomatis oleh useEffect
+    } catch (error) {
+      // Error sudah ditangani oleh store, tidak perlu action tambahan
+      console.error('Registration failed:', error);
     }
-    // Error handling is now managed by the store
   };
 
   return (
@@ -87,7 +88,9 @@ export default function SignUpPage() {
           />
 
           {(error || localError) && (
-            <div className="text-red-600 text-sm">{error || localError}</div>
+            <div className="text-red-600 text-sm bg-red-50 p-3 rounded-lg border border-red-200">
+              {error || localError}
+            </div>
           )}
 
           <div>

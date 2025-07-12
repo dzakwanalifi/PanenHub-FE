@@ -138,13 +138,20 @@ export default function AccountPage() {
 
           {/* Logout Button */}
           <div className="pt-4">
-            <MenuItem
-              icon={LogOut}
-              title="Keluar"
-              description="Keluar dari akun Anda"
-              href="#"
+            <button
               onClick={handleLogout}
-            />
+              className="w-full flex items-center justify-between p-4 bg-white rounded-lg border border-gray-200 hover:bg-red-50 hover:border-red-200 transition-colors"
+            >
+              <div className="flex items-center space-x-3">
+                <div className="w-10 h-10 bg-red-100 rounded-lg flex items-center justify-center">
+                  <LogOut className="w-5 h-5 text-red-600" />
+                </div>
+                <div className="text-left">
+                  <h3 className="font-semibold text-gray-900">Keluar</h3>
+                  <p className="text-sm text-gray-600">Keluar dari akun Anda</p>
+                </div>
+              </div>
+            </button>
           </div>
         </div>
       </div>

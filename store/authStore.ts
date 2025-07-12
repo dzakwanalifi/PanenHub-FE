@@ -1,98 +1,205 @@
+// store/authStore.ts
+
 import { create } from 'zustand';
-import { persist } from 'zustand/middleware';
-import { mockUsers, MockUser } from '@/lib/mock-data';
+import { persist, createJSONStorage } from 'zustand/middleware';
+import { supabase } from '@/lib/supabase';
+import { setApiToken } from '@/lib/api';
+
+// Definisikan tipe untuk data pengguna dan state
+interface User {
+  id: string;
+  name: string;
+  email: string;
+  phone?: string;
+  address?: string;
+  avatar?: string;
+  joinDate?: string;
+  isSeller?: boolean;
+  // tambahkan properti lain sesuai data dari API Anda
+}
+
+interface LoginRequest {
+  email: string;
+  password: string;
+}
+
+interface RegisterRequest {
+  name: string;
+  email: string;
+  password: string;
+}
 
 interface AuthState {
+  token: string | null;
+  user: User | null;
   isLoggedIn: boolean;
-  user: MockUser | null;
   isLoading: boolean;
   error: string | null;
-  login: (email: string, password: string) => Promise<{ success: boolean; error?: string }>;
+  login: (credentials: LoginRequest) => Promise<void>;
+  register: (data: RegisterRequest) => Promise<void>;
   logout: () => void;
-  register: (name: string, email: string, password: string) => Promise<{ success: boolean; error?: string }>;
   clearError: () => void;
 }
 
+// Buat store dengan middleware 'persist'
 export const useAuthStore = create<AuthState>()(
   persist(
     (set, get) => ({
-      isLoggedIn: false,
+      // --- Initial State ---
+      token: null,
       user: null,
+      isLoggedIn: false,
       isLoading: false,
       error: null,
-      
-      login: async (email: string, password: string) => {
+
+      // --- Actions ---
+
+      // Fungsi untuk LOGIN menggunakan Supabase Auth
+      login: async (credentials) => {
         set({ isLoading: true, error: null });
-        
         try {
-          // Simulate API delay
-          await new Promise(resolve => setTimeout(resolve, 1000));
-          
-          // Find user by email (password is ignored for prototype)
-          const user = mockUsers.find(u => u.email === email);
-          
-          if (user) {
-            set({ isLoggedIn: true, user, isLoading: false });
-            return { success: true };
+          const { data, error } = await supabase.auth.signInWithPassword({
+            email: credentials.email,
+            password: credentials.password,
+          });
+
+          if (error) {
+            throw new Error(error.message);
+          }
+
+          if (data.session && data.user) {
+            const token = data.session.access_token;
+            const user: User = {
+              id: data.user.id,
+              name: data.user.user_metadata?.name || data.user.email?.split('@')[0] || '',
+              email: data.user.email || '',
+              phone: data.user.user_metadata?.phone,
+              address: data.user.user_metadata?.address,
+              avatar: data.user.user_metadata?.avatar_url,
+              joinDate: data.user.created_at,
+              isSeller: data.user.user_metadata?.is_seller || false,
+            };
+
+            // Set token to API instance
+            setApiToken(token);
+
+            // Simpan token dan data user ke state
+            set({ 
+              token, 
+              user, 
+              isLoggedIn: true, 
+              isLoading: false 
+            });
+          }
+
+        } catch (err: any) {
+          const errorMessage = err.message || "Email atau password salah.";
+          set({ 
+            error: errorMessage, 
+            isLoading: false 
+          });
+          // Lempar error agar bisa ditangani di komponen/halaman
+          throw new Error(errorMessage);
+        }
+      },
+
+      // Fungsi untuk REGISTER menggunakan Supabase Auth
+      register: async (data) => {
+        set({ isLoading: true, error: null });
+        try {
+          const { data: authData, error } = await supabase.auth.signUp({
+            email: data.email,
+            password: data.password,
+            options: {
+              data: {
+                name: data.name,
+              },
+            },
+          });
+
+          if (error) {
+            throw new Error(error.message);
+          }
+
+          if (authData.session && authData.user) {
+            const token = authData.session.access_token;
+            const user: User = {
+              id: authData.user.id,
+              name: data.name,
+              email: authData.user.email || '',
+              phone: authData.user.user_metadata?.phone,
+              address: authData.user.user_metadata?.address,
+              avatar: authData.user.user_metadata?.avatar_url,
+              joinDate: authData.user.created_at,
+              isSeller: false,
+            };
+            
+            // Set token to API instance
+            setApiToken(token);
+            
+            set({ token, user, isLoggedIn: true, isLoading: false });
           } else {
-            set({ isLoading: false, error: 'Invalid email or password' });
-            return { success: false, error: 'Invalid email or password' };
+            // Email confirmation required
+            set({ 
+              isLoading: false,
+              error: "Please check your email to confirm your account."
+            });
           }
-        } catch (error) {
-          set({ isLoading: false, error: 'Login failed. Please try again.' });
-          return { success: false, error: 'Login failed. Please try again.' };
+
+        } catch (err: any) {
+          const errorMessage = err.message || "Gagal melakukan registrasi.";
+          set({ error: errorMessage, isLoading: false });
+          throw new Error(errorMessage);
         }
       },
-      
-      logout: () => {
-        set({ isLoggedIn: false, user: null, error: null });
-      },
-      
-      register: async (name: string, email: string, password: string) => {
-        set({ isLoading: true, error: null });
-        
+
+      // Fungsi untuk LOGOUT
+      logout: async () => {
         try {
-          // Simulate API delay
-          await new Promise(resolve => setTimeout(resolve, 1000));
-          
-          // Check if user already exists
-          const existingUser = mockUsers.find(u => u.email === email);
-          if (existingUser) {
-            set({ isLoading: false, error: 'User with this email already exists' });
-            return { success: false, error: 'User with this email already exists' };
-          }
-          
-          // Create new user (in real app, this would be sent to backend)
-          const newUser: MockUser = {
-            id: `user${Date.now()}`,
-            name,
-            email,
-            avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-4.0.3&auto=format&fit=crop&w=200&q=80',
-            joinDate: new Date().toLocaleDateString(),
-            isSeller: false
-          };
-          
-          // Add to mock users (this won't persist in real prototype, but simulates the flow)
-          mockUsers.push(newUser);
-          
-          set({ isLoggedIn: true, user: newUser, isLoading: false });
-          return { success: true };
+          await supabase.auth.signOut();
         } catch (error) {
-          set({ isLoading: false, error: 'Registration failed. Please try again.' });
-          return { success: false, error: 'Registration failed. Please try again.' };
+          console.error('Error signing out:', error);
         }
+        
+        // Clear token from API instance
+        setApiToken(null);
+        
+        // Hapus semua state otentikasi
+        set({ 
+          token: null, 
+          user: null, 
+          isLoggedIn: false, 
+          error: null 
+        });
       },
-      
+
+      // Fungsi untuk clear error
       clearError: () => {
         set({ error: null });
-      }
+      },
     }),
     {
-      name: 'auth-storage',
+      name: 'auth-storage', // nama item di localStorage
+      storage: createJSONStorage(() => localStorage),
+      // Hanya simpan data ini di localStorage, jangan simpan error atau loading state
       partialize: (state) => ({ 
-        isLoggedIn: state.isLoggedIn, 
-        user: state.user 
+        token: state.token, 
+        user: state.user, 
+        isLoggedIn: state.isLoggedIn 
       }),
+      // Prevent hydration issues
+      skipHydration: false,
+      // Initialize token when store is rehydrated
+      onRehydrateStorage: () => (state, error) => {
+        if (error) {
+          console.log('An error occurred during hydration:', error);
+          return;
+        }
+        
+        if (state?.token) {
+          setApiToken(state.token);
+        }
+      },
     }
   )
 );

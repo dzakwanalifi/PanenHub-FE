@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { persist } from 'zustand/middleware';
+import { persist, createJSONStorage } from 'zustand/middleware';
 
 interface FavoriteStore {
   favoriteIds: string[];
@@ -38,6 +38,9 @@ export const useFavoriteStore = create<FavoriteStore>()(
     }),
     {
       name: 'favorite-storage',
+      storage: createJSONStorage(() => localStorage),
+      // Only persist the favoriteIds array
+      partialize: (state) => ({ favoriteIds: state.favoriteIds }),
     }
   )
 ); 

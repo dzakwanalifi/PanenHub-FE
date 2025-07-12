@@ -20,7 +20,12 @@ export default function MessagesPage() {
     const otherUser = getUserById(otherParticipantId || '');
     const otherStore = getStoreById(otherParticipantId || '');
     
-    const otherParticipant = otherUser || {
+    const otherParticipant = otherUser ? {
+      id: otherUser.id,
+      name: otherUser.name,
+      avatar: otherUser.avatar,
+      isOnline: otherUser.isOnline ?? Math.random() > 0.5 // Default to random if not set
+    } : {
       id: otherParticipantId || '',
       name: otherStore?.name || 'Unknown',
       avatar: otherStore?.logo || 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-4.0.3&auto=format&fit=crop&w=100&q=80',

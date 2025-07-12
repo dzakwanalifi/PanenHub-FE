@@ -25,6 +25,42 @@ export default function Header() {
     closeAllOverlays();
   };
 
+  // Prevent hydration mismatch by not rendering auth-dependent content on server
+  if (!hasMounted) {
+    return (
+      <header className="sticky top-0 z-50 bg-white border-b border-gray-200">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center justify-between h-16">
+            {/* Logo */}
+            <Link href="/" className="flex items-center space-x-2">
+              <div className="w-8 h-8 bg-[#A5D6A7] rounded-lg flex items-center justify-center">
+                <Leaf className="w-5 h-5 text-white" />
+              </div>
+              <span className="text-xl font-bold text-[#1F2937]">PanenHub</span>
+            </Link>
+
+            {/* Desktop Search Bar */}
+            <div className="hidden md:flex flex-1 max-w-lg mx-8"></div>
+
+            {/* Desktop Navigation - Loading State */}
+            <div className="hidden md:flex items-center space-x-4">
+              <div className="w-8 h-8 bg-gray-200 rounded-lg animate-pulse"></div>
+              <div className="w-8 h-8 bg-gray-200 rounded-lg animate-pulse"></div>
+              <div className="w-24 h-8 bg-gray-200 rounded-lg animate-pulse"></div>
+            </div>
+
+            {/* Mobile Menu Button - Loading State */}
+            <div className="md:hidden flex items-center space-x-2">
+              <div className="w-8 h-8 bg-gray-200 rounded-lg animate-pulse"></div>
+              <div className="w-8 h-8 bg-gray-200 rounded-lg animate-pulse"></div>
+              <div className="w-8 h-8 bg-gray-200 rounded-lg animate-pulse"></div>
+            </div>
+          </div>
+        </div>
+      </header>
+    );
+  }
+
   return (
     <header className="sticky top-0 z-50 bg-white border-b border-gray-200">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -129,8 +165,8 @@ export default function Header() {
               className="relative p-2 text-[#1F2937]"
             >
               <Bell className="w-6 h-6" />
-              <span className={`absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center ${isLoggedIn && useUIStore.getState().notificationCount > 0 ? '' : 'hidden'}`}>
-                {useUIStore.getState().notificationCount}
+              <span className={`absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center ${isLoggedIn ? '' : 'hidden'}`}>
+                3
               </span>
             </button>
             <Link href="/cart" aria-label="View shopping cart" className="relative p-2 text-[#1F2937]">

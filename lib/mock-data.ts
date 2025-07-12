@@ -46,6 +46,7 @@ export interface MockUser {
   address?: string;
   joinDate: string;
   isSeller: boolean;
+  isOnline?: boolean;
 }
 
 export interface MockOrder {

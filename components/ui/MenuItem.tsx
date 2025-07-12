@@ -1,39 +1,30 @@
 'use client';
 import Link from 'next/link';
-import { DivideIcon as LucideIcon } from 'lucide-react';
+import { ChevronRight } from 'lucide-react';
+import React from 'react';
 
 interface MenuItemProps {
-  icon: LucideIcon;
+  icon: React.ComponentType<{ className?: string }>;
   title: string;
   description: string;
   href: string;
-  onClick?: () => void;
 }
 
-export default function MenuItem({ icon: Icon, title, description, href, onClick }: MenuItemProps) {
-  const content = (
-    <div className="flex items-center space-x-4 p-4 bg-white rounded-2xl shadow-lg hover:shadow-xl transition-all transform hover:scale-[1.02] cursor-pointer">
-      <div className="w-12 h-12 bg-[#2E7D32] bg-opacity-10 rounded-lg flex items-center justify-center">
-        <Icon className="w-6 h-6 text-[#2E7D32]" />
-      </div>
-      <div className="flex-1">
-        <h3 className="text-lg font-semibold text-gray-900 mb-1">{title}</h3>
-        <p className="text-sm text-gray-600">{description}</p>
-      </div>
-    </div>
-  );
-
-  if (onClick) {
-    return (
-      <button onClick={onClick} className="w-full text-left">
-        {content}
-      </button>
-    );
-  }
-
+export default function MenuItem({ icon: Icon, title, description, href }: MenuItemProps) {
   return (
     <Link href={href} className="block">
-      {content}
+      <div className="flex items-center justify-between p-4 bg-white rounded-lg border border-gray-200 hover:bg-gray-50 transition-colors">
+        <div className="flex items-center space-x-3">
+          <div className="w-10 h-10 bg-[#A5D6A7] rounded-lg flex items-center justify-center">
+            <Icon className="w-5 h-5 text-white" />
+          </div>
+          <div>
+            <h3 className="font-semibold text-gray-900">{title}</h3>
+            <p className="text-sm text-gray-600">{description}</p>
+          </div>
+        </div>
+        <ChevronRight className="w-5 h-5 text-gray-400" />
+      </div>
     </Link>
   );
 }

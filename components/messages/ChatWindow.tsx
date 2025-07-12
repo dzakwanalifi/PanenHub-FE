@@ -13,13 +13,13 @@ interface ChatWindowProps {
       avatar: string;
       isOnline: boolean;
     };
+    messages?: Array<{
+      id: string;
+      text: string;
+      timestamp: string;
+      senderId: string;
+    }>;
   };
-  messages?: Array<{
-    id: string;
-    text: string;
-    timestamp: string;
-    senderId: string;
-  }>;
   onBack: () => void;
 }
 

@@ -24,12 +24,13 @@ export default function LoginPage() {
     e.preventDefault();
     clearError();
     
-    const result = await login(email, password);
-    
-    if (result.success) {
-      router.push('/');
+    try {
+      await login({ email, password });
+      // Jika berhasil, user akan diarahkan otomatis oleh useEffect
+    } catch (error) {
+      // Error sudah ditangani oleh store, tidak perlu action tambahan
+      console.error('Login failed:', error);
     }
-    // Error handling is now managed by the store
   };
 
   return (
@@ -60,7 +61,9 @@ export default function LoginPage() {
           />
 
           {error && (
-            <div className="text-red-600 text-sm">{error}</div>
+            <div className="text-red-600 text-sm bg-red-50 p-3 rounded-lg border border-red-200">
+              {error}
+            </div>
           )}
 
           <div className="flex items-center justify-between">

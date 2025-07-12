@@ -18,10 +18,10 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
   const [quantity, setQuantity] = useState(1);
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
   const addItem = useCartStore((state) => state.addItem);
-  const { isFavorite, toggleFavorite } = useFavoriteStore((state) => ({
-    isFavorite: state.isFavorite(product.id),
-    toggleFavorite: state.toggleFavorite,
-  }));
+  
+  // Fix: Use separate selectors to avoid object creation causing infinite loops
+  const isFavorite = useFavoriteStore((state) => state.isFavorite(product.id));
+  const toggleFavorite = useFavoriteStore((state) => state.toggleFavorite);
 
   const handleAddToCart = () => {
     for (let i = 0; i < quantity; i++) {
@@ -66,6 +66,10 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
       // Final fallback - just alert the URL
       alert(`Bagikan produk ini: ${url}`);
     });
+  };
+
+  const handleToggleFavorite = () => {
+    toggleFavorite(product.id);
   };
 
   return (
@@ -175,7 +179,7 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
           {/* Action Buttons */}
           <div className="flex items-center space-x-4">
             <button
-              onClick={() => toggleFavorite(product.id)}
+              onClick={handleToggleFavorite}
               aria-label={isFavorite ? "Hapus dari favorit" : "Tambah ke favorit"}
               className={`p-3 rounded-lg border transition-colors ${
                 isFavorite
