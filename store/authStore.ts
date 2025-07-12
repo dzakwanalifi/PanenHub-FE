@@ -90,6 +90,12 @@ export const useAuthStore = create<AuthState>()(
               isLoggedIn: true, 
               isLoading: false 
             });
+
+            // PANGGIL FETCH CART SETELAH LOGIN SUKSES
+            // Import cart store secara dinamis untuk menghindari circular dependency
+            import('./cartStore').then(({ useCartStore }) => {
+              useCartStore.getState().fetchCart();
+            }).catch(console.error);
           }
 
         } catch (err: any) {
@@ -138,6 +144,11 @@ export const useAuthStore = create<AuthState>()(
             setApiToken(token);
             
             set({ token, user, isLoggedIn: true, isLoading: false });
+
+            // PANGGIL FETCH CART SETELAH REGISTER SUKSES
+            import('./cartStore').then(({ useCartStore }) => {
+              useCartStore.getState().fetchCart();
+            }).catch(console.error);
           } else {
             // Email confirmation required
             set({ 
@@ -161,6 +172,11 @@ export const useAuthStore = create<AuthState>()(
           console.error('Error signing out:', error);
         }
         
+        // PANGGIL CLEAR CART SAAT LOGOUT
+        import('./cartStore').then(({ useCartStore }) => {
+          useCartStore.getState().clearCart();
+        }).catch(console.error);
+
         // Clear token from API instance
         setApiToken(null);
         
@@ -198,6 +214,10 @@ export const useAuthStore = create<AuthState>()(
         
         if (state?.token) {
           setApiToken(state.token);
+          // PANGGIL FETCH CART SETELAH REHYDRATION
+          import('./cartStore').then(({ useCartStore }) => {
+            useCartStore.getState().fetchCart();
+          }).catch(console.error);
         }
       },
     }

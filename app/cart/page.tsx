@@ -1,14 +1,49 @@
 'use client';
+import { useEffect } from 'react';
 import { useCartStore } from '@/store/cartStore';
 import CartItem from '@/components/ui/CartItem';
 import OrderSummary from '@/components/ui/OrderSummary';
+import Spinner from '@/components/ui/Spinner';
 import Link from 'next/link';
-import { ShoppingBag } from 'lucide-react';
+import { ShoppingBag, AlertCircle } from 'lucide-react';
 
 export default function CartPage() {
-  const { items } = useCartStore();
+  const { cart, isLoading, error, fetchCart } = useCartStore();
 
-  if (items.length === 0) {
+  useEffect(() => {
+    fetchCart();
+  }, []);
+
+  if (isLoading) {
+    return (
+      <div className="container mx-auto px-4 py-8">
+        <div className="text-center">
+          <Spinner />
+          <p className="mt-4 text-gray-600">Memuat keranjang...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="container mx-auto px-4 py-8">
+        <div className="text-center max-w-md mx-auto">
+          <AlertCircle className="w-24 h-24 text-red-300 mx-auto mb-4" />
+          <h1 className="text-2xl font-bold text-[#1F2937] mb-2">Terjadi Kesalahan</h1>
+          <p className="text-gray-500 mb-8">{error}</p>
+          <button
+            onClick={fetchCart}
+            className="bg-[#A5D6A7] text-[#1F2937] px-8 py-3 rounded-full font-semibold hover:bg-[#B9E4C9] transition-colors"
+          >
+            Coba Lagi
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  if (!cart || cart.items.length === 0) {
     return (
       <div className="container mx-auto px-4 py-8">
         <div className="text-center max-w-md mx-auto">
@@ -18,7 +53,7 @@ export default function CartPage() {
             Sepertinya Anda belum menambahkan produk apapun ke keranjang.
           </p>
           <Link
-            href="/"
+            href="/products"
             className="bg-[#A5D6A7] text-[#1F2937] px-8 py-3 rounded-full font-semibold hover:bg-[#B9E4C9] transition-colors"
           >
             Lanjut Belanja
@@ -35,8 +70,19 @@ export default function CartPage() {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 pb-32 md:pb-8">
         {/* Cart Items */}
         <div className="lg:col-span-2 space-y-4">
-          {items.map((item) => (
-            <CartItem key={item.cartItemId} item={item} />
+          {cart.items.map((item) => (
+            <CartItem 
+              key={item.id} 
+              item={{
+                id: item.productId,
+                cartItemId: item.id,
+                name: item.name,
+                price: item.price,
+                quantity: item.quantity,
+                image: item.imageUrl || '/placeholder-product.jpg',
+                store: 'PanenHub' // Default store name atau bisa diambil dari data produk
+              }} 
+            />
           ))}
         </div>
 
