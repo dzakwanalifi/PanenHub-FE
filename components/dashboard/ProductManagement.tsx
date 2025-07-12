@@ -1,66 +1,32 @@
 'use client';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Plus, Edit, Trash2, Eye, Search, Filter } from 'lucide-react';
 import Link from 'next/link';
-
-interface Product {
-  id: string;
-  name: string;
-  price: number;
-  stock: number;
-  sales: number;
-  status: 'active' | 'draft' | 'out_of_stock';
-  image: string;
-  category: string;
-}
+import { useProductStore } from '@/store/productStore';
+import { Product } from '@/types';
+import LoadingSpinner from '@/components/ui/Spinner';
 
 export default function ProductManagement() {
   const [searchTerm, setSearchTerm] = useState('');
   const [filterStatus, setFilterStatus] = useState('all');
+  const { products, isLoading, error, fetchSellerProducts, deleteProduct } = useProductStore();
 
-  // Mock products data
-  const products: Product[] = [
-    {
-      id: '1',
-      name: 'Organic Carrots',
-      price: 2.99,
-      stock: 45,
-      sales: 120,
-      status: 'active',
-      image: 'https://images.unsplash.com/photo-1445282768818-728615cc910a?ixlib=rb-4.0.3&auto=format&fit=crop&w=200&q=80',
-      category: 'Vegetables',
-    },
-    {
-      id: '2',
-      name: 'Fresh Spinach',
-      price: 3.49,
-      stock: 0,
-      sales: 89,
-      status: 'out_of_stock',
-      image: 'https://images.unsplash.com/photo-1576045057995-568f588f82fb?ixlib=rb-4.0.3&auto=format&fit=crop&w=200&q=80',
-      category: 'Vegetables',
-    },
-    {
-      id: '3',
-      name: 'Red Tomatoes',
-      price: 4.99,
-      stock: 28,
-      sales: 156,
-      status: 'active',
-      image: 'https://images.unsplash.com/photo-1546470427-e2e5c92b3c38?ixlib=rb-4.0.3&auto=format&fit=crop&w=200&q=80',
-      category: 'Vegetables',
-    },
-    {
-      id: '4',
-      name: 'Sweet Potatoes',
-      price: 3.99,
-      stock: 67,
-      sales: 0,
-      status: 'draft',
-      image: 'https://images.unsplash.com/photo-1519664398569-62bd70cf903e?ixlib=rb-4.0.3&auto=format&fit=crop&w=200&q=80',
-      category: 'Vegetables',
-    },
-  ];
+  useEffect(() => {
+    fetchSellerProducts();
+  }, [fetchSellerProducts]);
+
+  const handleDelete = async (productId: string) => {
+    if (!window.confirm('Are you sure you want to delete this product?')) {
+      return;
+    }
+
+    try {
+      await deleteProduct(productId);
+    } catch (err) {
+      console.error('Failed to delete product:', err);
+      alert('Failed to delete product. Please try again.');
+    }
+  };
 
   const getStatusBadge = (status: string) => {
     const statusConfig = {
@@ -83,6 +49,28 @@ export default function ProductManagement() {
     return matchesSearch && matchesFilter;
   });
 
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <LoadingSpinner />
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="text-center p-10">
+        <p className="text-red-500 mb-4">{error}</p>
+        <button 
+          onClick={() => fetchSellerProducts()}
+          className="text-blue-600 hover:underline"
+        >
+          Try Again
+        </button>
+      </div>
+    );
+  }
+
   return (
     <div className="p-4 md:p-6">
       {/* Header */}
@@ -103,7 +91,7 @@ export default function ProductManagement() {
       </div>
 
       {/* Search and Filter */}
-      <div className="bg-white rounded-2xl shadow-lg p-4 md:p-6 mb-6">
+      <div className="bg-white rounded-2xl shadow-lg p-6 mb-6">
         <div className="flex flex-col md:flex-row gap-4">
           <div className="flex-1 relative">
             <Search className="absolute left-3 top-3 w-5 h-5 text-gray-400" />
@@ -132,12 +120,12 @@ export default function ProductManagement() {
       </div>
 
       {/* Products Grid - Mobile */}
-      <div className="md:hidden space-y-4 mb-20">
+      <div className="grid gap-4 md:hidden">
         {filteredProducts.map((product) => (
           <div key={product.id} className="bg-white rounded-2xl shadow-lg overflow-hidden">
             <div className="flex">
               <img 
-                src={product.image} 
+                src={product.images[0]} 
                 alt={product.name}
                 className="w-20 h-20 object-cover"
               />
@@ -146,7 +134,7 @@ export default function ProductManagement() {
                   <h3 className="font-semibold text-gray-900 text-sm">{product.name}</h3>
                   {getStatusBadge(product.status)}
                 </div>
-                <p className="text-lg font-bold text-[#2E7D32] mb-1">${product.price}</p>
+                <p className="text-lg font-bold text-[#2E7D32] mb-1">Rp {product.price.toLocaleString('id-ID')}</p>
                 <div className="flex items-center justify-between text-xs text-gray-600 mb-3">
                   <span>Stock: {product.stock}</span>
                   <span>Sales: {product.sales}</span>
@@ -158,10 +146,16 @@ export default function ProductManagement() {
                   >
                     Edit
                   </Link>
-                  <button className="bg-gray-100 text-gray-600 py-2 px-3 rounded-lg hover:bg-gray-200 transition-colors">
+                  <Link
+                    href={`/products/${product.id}`}
+                    className="bg-gray-100 text-gray-600 py-2 px-3 rounded-lg hover:bg-gray-200 transition-colors"
+                  >
                     <Eye className="w-4 h-4" />
-                  </button>
-                  <button className="bg-gray-100 text-gray-600 py-2 px-3 rounded-lg hover:bg-gray-200 transition-colors">
+                  </Link>
+                  <button 
+                    onClick={() => handleDelete(product.id)}
+                    className="bg-gray-100 text-gray-600 py-2 px-3 rounded-lg hover:bg-gray-200 transition-colors"
+                  >
                     <Trash2 className="w-4 h-4" />
                   </button>
                 </div>
@@ -172,7 +166,7 @@ export default function ProductManagement() {
       </div>
 
       {/* Products Table - Desktop */}
-      <div className="hidden md:block bg-white rounded-2xl shadow-lg overflow-hidden">
+      <div className="hidden md:block bg-white rounded-2xl shadow-lg">
         <div className="overflow-x-auto">
           <table className="w-full">
             <thead className="bg-gray-50">
@@ -185,13 +179,13 @@ export default function ProductManagement() {
                 <th className="px-6 py-4 text-left text-sm font-medium text-gray-600">Actions</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-gray-200">
+            <tbody>
               {filteredProducts.map((product) => (
                 <tr key={product.id} className="hover:bg-gray-50">
                   <td className="px-6 py-4">
                     <div className="flex items-center">
                       <img 
-                        src={product.image} 
+                        src={product.images[0]} 
                         alt={product.name}
                         className="w-12 h-12 rounded-lg object-cover mr-4"
                       />
@@ -202,7 +196,7 @@ export default function ProductManagement() {
                     </div>
                   </td>
                   <td className="px-6 py-4 text-lg font-bold text-[#2E7D32]">
-                    ${product.price}
+                    Rp {product.price.toLocaleString('id-ID')}
                   </td>
                   <td className="px-6 py-4 text-gray-900">
                     {product.stock}
@@ -222,10 +216,16 @@ export default function ProductManagement() {
                         <Edit className="w-4 h-4 mr-1" />
                         Edit
                       </Link>
-                      <button className="bg-gray-100 text-gray-600 py-2 px-3 rounded-lg hover:bg-gray-200 transition-colors">
+                      <Link
+                        href={`/products/${product.id}`}
+                        className="bg-gray-100 text-gray-600 py-2 px-3 rounded-lg hover:bg-gray-200 transition-colors"
+                      >
                         <Eye className="w-4 h-4" />
-                      </button>
-                      <button className="bg-gray-100 text-gray-600 py-2 px-3 rounded-lg hover:bg-gray-200 transition-colors">
+                      </Link>
+                      <button 
+                        onClick={() => handleDelete(product.id)}
+                        className="bg-gray-100 text-gray-600 py-2 px-3 rounded-lg hover:bg-gray-200 transition-colors"
+                      >
                         <Trash2 className="w-4 h-4" />
                       </button>
                     </div>

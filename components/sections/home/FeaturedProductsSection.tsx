@@ -3,17 +3,30 @@ import { useState, useEffect, useMemo } from 'react';
 import { Filter, SlidersHorizontal } from 'lucide-react';
 import ProductCard from '@/components/ui/ProductCard';
 import FilterPanel, { FilterOptions } from '@/components/ui/FilterPanel';
-import { mockProducts, mockStores } from '@/lib/mock-data';
+import api from '@/lib/api';
 
 interface FeaturedProductsSectionProps {
   selectedCategory: string;
   searchTerm: string;
 }
 
+interface Product {
+  id: string;
+  title: string;
+  price: number;
+  image_urls: string[] | null;
+  stores: {
+    store_name: string;
+  };
+  category?: string;
+  reviewCount?: number;
+}
+
 export default function FeaturedProductsSection({ selectedCategory, searchTerm }: FeaturedProductsSectionProps) {
   const [isLoading, setIsLoading] = useState(true);
   const [isFilterPanelOpen, setIsFilterPanelOpen] = useState(false);
   const [sortBy, setSortBy] = useState('popular');
+  const [products, setProducts] = useState<Product[]>([]);
   const [filters, setFilters] = useState<FilterOptions>(() => ({
     distance: 'any',
     category: 'all',
@@ -21,18 +34,27 @@ export default function FeaturedProductsSection({ selectedCategory, searchTerm }
     rating: 0,
   }));
 
-  // Simulate loading state
+  // Fetch products from backend API
   useEffect(() => {
-    const timer = setTimeout(() => {
-      setIsLoading(false);
-    }, 1500);
+    const fetchProducts = async () => {
+      try {
+        setIsLoading(true);
+        const response = await api.get('/products');
+        setProducts(response.data.data || response.data || []);
+      } catch (error) {
+        console.error('Error fetching products:', error);
+        setProducts([]);
+      } finally {
+        setIsLoading(false);
+      }
+    };
 
-    return () => clearTimeout(timer);
+    fetchProducts();
   }, []);
 
   // Add static distance to products (consistent based on product ID)
   const productsWithDistance = useMemo(() => 
-    mockProducts.map(product => {
+    products.map(product => {
       // Generate a consistent distance based on the product ID
       const hash = product.id.split('').reduce((a, b) => {
         a = ((a << 5) - a) + b.charCodeAt(0);
@@ -42,8 +64,10 @@ export default function FeaturedProductsSection({ selectedCategory, searchTerm }
       return {
         ...product,
         distance,
+        // Add mock rating for now since backend doesn't have it yet
+        rating: 4.0 + (Math.abs(hash) % 10) / 10,
       };
-    }), []
+    }), [products]
   );
 
   // Extract stable filter values
@@ -60,11 +84,11 @@ export default function FeaturedProductsSection({ selectedCategory, searchTerm }
       // Filter by category (use both selectedCategory and filter category)
       const selectedCat = selectedCategory === 'all' ? filterCategory : selectedCategory;
       const categoryMatch = selectedCat === 'all' || 
-        product.category.toLowerCase() === selectedCat.toLowerCase();
+        product.category?.toLowerCase() === selectedCat.toLowerCase();
       
       // Filter by search term
       const searchMatch = searchTerm === '' || 
-        product.name.toLowerCase().includes(searchTerm.toLowerCase());
+        product.title.toLowerCase().includes(searchTerm.toLowerCase());
 
       // Filter by distance
       const distanceMatch = filterDistance === 'any' || 
@@ -84,19 +108,21 @@ export default function FeaturedProductsSection({ selectedCategory, searchTerm }
     // Sort filtered products
     return [...filteredProducts].sort((a, b) => {
       switch (sortBy) {
+        case 'rating':
+          return b.rating - a.rating;
+        case 'reviews':
+          return (b.reviewCount || 0) - (a.reviewCount || 0);
         case 'distance':
           return a.distance - b.distance;
         case 'price-low':
           return a.price - b.price;
         case 'price-high':
           return b.price - a.price;
-        case 'rating':
-          return b.rating - a.rating;
         case 'newest':
           return new Date(b.id).getTime() - new Date(a.id).getTime(); // Simple mock sorting by ID
         case 'popular':
         default:
-          return b.reviewCount - a.reviewCount;
+          return (b.reviewCount || 0) - (a.reviewCount || 0);
       }
     });
   }, [productsWithDistance, selectedCategory, searchTerm, filterDistance, filterCategory, filterPriceMin, filterPriceMax, filterRating, sortBy]);
@@ -151,12 +177,12 @@ export default function FeaturedProductsSection({ selectedCategory, searchTerm }
             <ProductCard
               key={product.id}
               id={product.id}
-              name={product.name}
+              name={product.title}
               price={product.price}
-              originalPrice={product.originalPrice}
-              image={product.images[0]}
+              originalPrice={undefined}
+              image={product.image_urls?.[0] || '/images/placeholder-product.svg'}
               rating={product.rating}
-              store={mockStores.find(s => s.id === product.storeId)?.name || 'Unknown Store'}
+              store={product.stores?.store_name || 'Unknown Store'}
             />
           ))
         ) : (

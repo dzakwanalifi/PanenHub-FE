@@ -39,6 +39,7 @@ interface AuthState {
   register: (data: RegisterRequest) => Promise<void>;
   logout: () => void;
   clearError: () => void;
+  refreshToken: () => Promise<boolean>;
 }
 
 // Buat store dengan middleware 'persist'
@@ -51,7 +52,7 @@ export const useAuthStore = create<AuthState>()(
       isLoggedIn: false,
       isLoading: false,
       error: null,
-
+      
       // --- Actions ---
 
       // Fungsi untuk LOGIN menggunakan Supabase Auth
@@ -82,6 +83,7 @@ export const useAuthStore = create<AuthState>()(
 
             // Set token to API instance
             setApiToken(token);
+            console.log('Login successful, token set:', token.substring(0, 20) + '...');
 
             // Simpan token dan data user ke state
             set({ 
@@ -93,9 +95,11 @@ export const useAuthStore = create<AuthState>()(
 
             // PANGGIL FETCH CART SETELAH LOGIN SUKSES
             // Import cart store secara dinamis untuk menghindari circular dependency
-            import('./cartStore').then(({ useCartStore }) => {
-              useCartStore.getState().fetchCart();
-            }).catch(console.error);
+            setTimeout(() => {
+              import('./cartStore').then(({ useCartStore }) => {
+                useCartStore.getState().fetchCart();
+              }).catch(console.error);
+            }, 100);
           }
 
         } catch (err: any) {
@@ -108,7 +112,7 @@ export const useAuthStore = create<AuthState>()(
           throw new Error(errorMessage);
         }
       },
-
+      
       // Fungsi untuk REGISTER menggunakan Supabase Auth
       register: async (data) => {
         set({ isLoading: true, error: null });
@@ -126,7 +130,7 @@ export const useAuthStore = create<AuthState>()(
           if (error) {
             throw new Error(error.message);
           }
-
+          
           if (authData.session && authData.user) {
             const token = authData.session.access_token;
             const user: User = {
@@ -138,17 +142,19 @@ export const useAuthStore = create<AuthState>()(
               avatar: authData.user.user_metadata?.avatar_url,
               joinDate: authData.user.created_at,
               isSeller: false,
-            };
-            
+          };
+          
             // Set token to API instance
             setApiToken(token);
             
             set({ token, user, isLoggedIn: true, isLoading: false });
 
             // PANGGIL FETCH CART SETELAH REGISTER SUKSES
-            import('./cartStore').then(({ useCartStore }) => {
-              useCartStore.getState().fetchCart();
-            }).catch(console.error);
+            setTimeout(() => {
+              import('./cartStore').then(({ useCartStore }) => {
+                useCartStore.getState().fetchCart();
+              }).catch(console.error);
+            }, 100);
           } else {
             // Email confirmation required
             set({ 
@@ -173,6 +179,7 @@ export const useAuthStore = create<AuthState>()(
         }
         
         // PANGGIL CLEAR CART SAAT LOGOUT
+        // Import cart store secara dinamis untuk menghindari circular dependency
         import('./cartStore').then(({ useCartStore }) => {
           useCartStore.getState().clearCart();
         }).catch(console.error);
@@ -192,6 +199,45 @@ export const useAuthStore = create<AuthState>()(
       // Fungsi untuk clear error
       clearError: () => {
         set({ error: null });
+      },
+
+      // Fungsi untuk refresh token
+      refreshToken: async () => {
+        try {
+          const { data, error } = await supabase.auth.refreshSession();
+          if (error) throw error;
+
+          if (data.session) {
+            const token = data.session.access_token;
+            const user: User = {
+              id: data.session.user.id,
+              name: data.session.user.user_metadata?.name || data.session.user.email?.split('@')[0] || '',
+              email: data.session.user.email || '',
+              phone: data.session.user.user_metadata?.phone,
+              address: data.session.user.user_metadata?.address,
+              avatar: data.session.user.user_metadata?.avatar_url,
+              joinDate: data.session.user.created_at,
+              isSeller: data.session.user.user_metadata?.is_seller || false,
+            };
+
+            setApiToken(token);
+            console.log('Token refreshed, new token set:', token.substring(0, 20) + '...');
+            set({ token, user, isLoggedIn: true });
+            return true;
+          }
+          return false;
+        } catch (error) {
+          console.error('Token refresh failed:', error);
+          // Clear auth state if refresh fails
+          setApiToken(null);
+          set({ 
+            token: null, 
+            user: null, 
+            isLoggedIn: false, 
+            error: null 
+          });
+          return false;
+        }
       },
     }),
     {
@@ -213,11 +259,40 @@ export const useAuthStore = create<AuthState>()(
         }
         
         if (state?.token) {
-          setApiToken(state.token);
-          // PANGGIL FETCH CART SETELAH REHYDRATION
-          import('./cartStore').then(({ useCartStore }) => {
-            useCartStore.getState().fetchCart();
-          }).catch(console.error);
+          // Validate token with Supabase before setting it
+          supabase.auth.getUser(state.token).then(({ data, error }) => {
+            if (error || !data.user) {
+              console.log('Token expired or invalid, clearing auth state');
+              // Clear expired token - call logout directly from store
+              setApiToken(null);
+              useAuthStore.setState({ 
+                token: null, 
+                user: null, 
+                isLoggedIn: false, 
+                error: null 
+              });
+            } else {
+              console.log('Token valid, setting API token');
+              setApiToken(state.token);
+              // PANGGIL FETCH CART SETELAH REHYDRATION
+              // Import cart store secara dinamis untuk menghindari circular dependency
+              setTimeout(() => {
+                import('./cartStore').then(({ useCartStore }) => {
+                  useCartStore.getState().fetchCart();
+                }).catch(console.error);
+              }, 200);
+            }
+          }).catch((err) => {
+            console.error('Error validating token:', err);
+            // Clear expired token - call logout directly from store
+            setApiToken(null);
+            useAuthStore.setState({ 
+              token: null, 
+              user: null, 
+              isLoggedIn: false, 
+              error: null 
+            });
+          });
         }
       },
     }

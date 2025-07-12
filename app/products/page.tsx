@@ -3,8 +3,7 @@ import { useState, useEffect, useMemo } from 'react';
 import { Filter, SlidersHorizontal, Search, MapPin } from 'lucide-react';
 import ProductCard from '@/components/ui/ProductCard';
 import FilterPanel, { FilterOptions } from '@/components/ui/FilterPanel';
-import { products, Product } from '@/lib/product-data';
-import { mockProducts, mockStores } from '@/lib/mock-data';
+import api from '@/lib/api';
 import { useLocationStore } from '@/store/locationStore';
 
 // Categories for filtering
@@ -16,12 +15,23 @@ const categories = [
   { id: 'grains', name: 'Biji-bijian' },
 ];
 
+interface Product {
+  id: string;
+  title: string;
+  price: number;
+  image_urls: string[] | null;
+  stores: {
+    store_name: string;
+  };
+}
+
 export default function ProductsPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [isFilterPanelOpen, setIsFilterPanelOpen] = useState(false);
   const [sortBy, setSortBy] = useState('popular');
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
+  const [products, setProducts] = useState<Product[]>([]);
   const [filters, setFilters] = useState<FilterOptions>(() => ({
     distance: 'any',
     category: 'all',
@@ -31,18 +41,27 @@ export default function ProductsPage() {
 
   const currentLocation = useLocationStore((state) => state.currentLocation);
 
-  // Simulate loading state
+  // Fetch products from backend API
   useEffect(() => {
-    const timer = setTimeout(() => {
-      setIsLoading(false);
-    }, 1000);
+    const fetchProducts = async () => {
+      try {
+        setIsLoading(true);
+        const response = await api.get('/products');
+        setProducts(response.data.data || response.data || []);
+      } catch (error) {
+        console.error('Error fetching products:', error);
+        setProducts([]);
+      } finally {
+        setIsLoading(false);
+      }
+    };
 
-    return () => clearTimeout(timer);
+    fetchProducts();
   }, []);
 
   // Add static distance to products (consistent based on product ID)
   const productsWithDistance = useMemo(() => 
-    mockProducts.map(product => {
+    products.map(product => {
       // Generate a consistent distance based on the product ID
       const hash = product.id.split('').reduce((a, b) => {
         a = ((a << 5) - a) + b.charCodeAt(0);
@@ -52,31 +71,23 @@ export default function ProductsPage() {
       return {
         ...product,
         distance,
+        // Add mock rating for now since backend doesn't have it yet
+        rating: 4.0 + (Math.abs(hash) % 10) / 10,
       };
-    }), []
+    }), [products]
   );
 
-  // Extract stable filter values
-  const filterDistance = filters.distance;
-  const filterCategory = filters.category;
-  const filterPriceMin = filters.priceRange[0];
-  const filterPriceMax = filters.priceRange[1];
-  const filterRating = filters.rating;
-
-  // Memoize filtering and sorting to prevent infinite re-renders
+  // Apply filters and sorting
   const sortedProducts = useMemo(() => {
+    // Extract stable filter values
+    const filterDistance = filters.distance;
+    const filterCategory = filters.category;
+    const filterPriceMin = filters.priceRange[0];
+    const filterPriceMax = filters.priceRange[1];
+    const filterRating = filters.rating;
+
     // Filter products based on all criteria
     const filteredProducts = productsWithDistance.filter(product => {
-      // Filter by category (use both selectedCategory and filter category)
-      const selectedCat = selectedCategory === 'all' ? filterCategory : selectedCategory;
-      const categoryMatch = selectedCat === 'all' || 
-        product.category.toLowerCase() === selectedCat.toLowerCase();
-      
-      // Filter by search term
-      const searchMatch = searchTerm === '' || 
-        product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        product.description.toLowerCase().includes(searchTerm.toLowerCase());
-
       // Filter by distance
       const distanceMatch = filterDistance === 'any' || 
         (filterDistance === 'under1' && product.distance < 1) ||
@@ -89,28 +100,39 @@ export default function ProductsPage() {
       // Filter by rating
       const ratingMatch = filterRating === 0 || product.rating >= filterRating;
       
-      return categoryMatch && searchMatch && distanceMatch && priceMatch && ratingMatch;
+      // Filter by search term
+      const searchMatch = searchTerm === '' || 
+        product.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        (product.stores?.store_name || '').toLowerCase().includes(searchTerm.toLowerCase());
+
+      // Filter by category (for now, since backend doesn't have category, we'll skip this filter)
+      const categoryMatch = selectedCategory === 'all'; // Always true for now since backend doesn't have category
+
+      return distanceMatch && priceMatch && ratingMatch && searchMatch && categoryMatch;
     });
 
-    // Sort filtered products
+    // Apply sorting
     return [...filteredProducts].sort((a, b) => {
       switch (sortBy) {
-        case 'distance':
-          return a.distance - b.distance;
         case 'price-low':
           return a.price - b.price;
         case 'price-high':
           return b.price - a.price;
         case 'rating':
           return b.rating - a.rating;
+        case 'reviews':
+          // Since we don't have reviewCount from backend, use rating as fallback
+          return b.rating - a.rating;
+        case 'distance':
+          return a.distance - b.distance;
         case 'newest':
           return new Date(b.id).getTime() - new Date(a.id).getTime(); // Simple mock sorting by ID
         case 'popular':
         default:
-          return b.reviewCount - a.reviewCount;
+          return b.rating - a.rating; // Sort by rating for popularity
       }
     });
-  }, [productsWithDistance, selectedCategory, searchTerm, filterDistance, filterCategory, filterPriceMin, filterPriceMax, filterRating, sortBy]);
+  }, [productsWithDistance, selectedCategory, searchTerm, filters, sortBy]);
 
   const handleApplyFilters = (newFilters: FilterOptions) => {
     setFilters(newFilters);
@@ -234,12 +256,12 @@ export default function ProductsPage() {
               <ProductCard
                 key={product.id}
                 id={product.id}
-                name={product.name}
+                name={product.title}
                 price={product.price}
-                originalPrice={product.originalPrice}
-                image={product.images[0]}
+                originalPrice={product.price} // Assuming originalPrice is the same as price for now
+                image={product.image_urls?.[0] || '/images/placeholder-product.svg'}
                 rating={product.rating}
-                store={mockStores.find(s => s.id === product.storeId)?.name || 'Unknown Store'}
+                store={product.stores?.store_name || ''}
               />
             ))
           ) : (

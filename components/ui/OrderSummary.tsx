@@ -5,16 +5,55 @@ import Button from './Button';
 import Link from 'next/link';
 import { formatPrice } from '@/lib/constants';
 
-export default function OrderSummary() {
-  const { items } = useCartStore();
+interface OrderSummaryProps {
+  isMobile?: boolean;
+}
+
+export default function OrderSummary({ isMobile = false }: OrderSummaryProps) {
+  const { cart } = useCartStore();
+  
+  // Convert new cart structure to old format for calculateServerSideTotal
+  const legacyItems = cart?.items.map(item => ({
+    id: item.id,
+    cartItemId: item.id,
+    name: item.product.title,
+    price: item.product.price,
+    quantity: item.quantity,
+    image: item.product.image_urls?.[0] || '/images/placeholder-product.svg',
+    store: item.product.store.store_name
+  })) || [];
   
   // Use server-side calculation for authoritative pricing
-  const priceData = calculateServerSideTotal(items);
+  const priceData = calculateServerSideTotal(legacyItems);
 
-  if (items.length === 0) {
+  if (!cart || cart.items.length === 0) {
     return null;
   }
 
+  // Mobile compact version
+  if (isMobile) {
+    return (
+      <div className="bg-white">
+        <div className="flex items-center justify-between mb-4">
+          <div>
+            <span className="text-sm text-gray-600">
+              {cart.items.length} item{cart.items.length > 1 ? 's' : ''}
+            </span>
+            <div className="text-lg font-bold text-[#2E7D32]">
+              {formatPrice(priceData.finalTotal)}
+            </div>
+          </div>
+          <Link href="/checkout" className="flex-shrink-0">
+            <Button className="px-8 py-3 text-base font-semibold" size="lg">
+              Checkout
+            </Button>
+          </Link>
+        </div>
+      </div>
+    );
+  }
+
+  // Desktop full version
   return (
     <div className="bg-white rounded-2xl shadow-lg p-6">
       <h3 className="text-lg font-semibold text-[#1F2937] mb-4">Ringkasan Pesanan</h3>

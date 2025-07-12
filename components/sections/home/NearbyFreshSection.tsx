@@ -2,23 +2,44 @@
 import { useState, useEffect, useMemo } from 'react';
 import { Sparkles, ArrowRight } from 'lucide-react';
 import ProductCard from '@/components/ui/ProductCard';
-import { mockProducts, mockStores } from '@/lib/mock-data';
+import api from '@/lib/api';
+import { PLACEHOLDER_PRODUCT_IMAGE } from '@/lib/constants';
+
+interface Product {
+  id: string;
+  title: string;
+  price: number;
+  image_urls: string[] | null;
+  stores: {
+    store_name: string;
+  };
+}
 
 export default function NearbyFreshSection() {
   const [isLoading, setIsLoading] = useState(true);
+  const [products, setProducts] = useState<Product[]>([]);
 
-  // Simulate loading state
+  // Fetch products from backend API
   useEffect(() => {
-    const timer = setTimeout(() => {
-      setIsLoading(false);
-    }, 1000);
+    const fetchProducts = async () => {
+      try {
+        setIsLoading(true);
+        const response = await api.get('/products');
+        setProducts(response.data.data || response.data || []);
+      } catch (error) {
+        console.error('Error fetching products:', error);
+        setProducts([]);
+      } finally {
+        setIsLoading(false);
+      }
+    };
 
-    return () => clearTimeout(timer);
+    fetchProducts();
   }, []);
 
   // Add static distance and filter for nearby products (properly memoized to prevent infinite re-renders)
   const nearbyFreshProducts = useMemo(() => {
-    return mockProducts
+    return products
       .map(product => {
         // Generate a consistent distance based on the product ID (same algorithm as ProductCard)
         const hash = product.id.split('').reduce((a, b) => {
@@ -30,6 +51,8 @@ export default function NearbyFreshSection() {
         return {
           ...product,
           distance,
+          // Add mock rating for now since backend doesn't have it yet
+          rating: 4.0 + (Math.abs(hash) % 10) / 10,
           isNew: Math.random() > 0.5, // Mock "new" flag - this will be consistent per product due to static seed
         };
       })
@@ -38,7 +61,7 @@ export default function NearbyFreshSection() {
         product.isNew // Only "new" products
       )
       .slice(0, 6); // Limit to 6 products
-  }, []); // Empty dependency array since mockProducts is static
+  }, [products]); // Depend on products instead of empty array
 
   if (nearbyFreshProducts.length === 0) {
     return null; // Don't render section if no products match criteria
@@ -90,12 +113,12 @@ export default function NearbyFreshSection() {
                 
                 <ProductCard
                   id={product.id}
-                  name={product.name}
+                  name={product.title}
                   price={product.price}
-                  originalPrice={product.originalPrice}
-                  image={product.images[0]}
+                  originalPrice={product.price} // Assuming original price is the same as current price for now
+                  image={product.image_urls?.[0] || PLACEHOLDER_PRODUCT_IMAGE}
                   rating={product.rating}
-                  store={mockStores.find(s => s.id === product.storeId)?.name || 'Unknown Store'}
+                  store={product.stores.store_name}
                 />
               </div>
             ))

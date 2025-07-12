@@ -17,23 +17,19 @@ interface ProductDetailClientProps {
 export default function ProductDetailClient({ product }: ProductDetailClientProps) {
   const [quantity, setQuantity] = useState(1);
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
-  const addItem = useCartStore((state) => state.addItem);
+  const addToCart = useCartStore((state) => state.addToCart);
   
   // Fix: Use separate selectors to avoid object creation causing infinite loops
   const isFavorite = useFavoriteStore((state) => state.isFavorite(product.id));
   const toggleFavorite = useFavoriteStore((state) => state.toggleFavorite);
 
-  const handleAddToCart = () => {
-    for (let i = 0; i < quantity; i++) {
-      addItem({
-        id: product.id,
-        name: product.name,
-        price: product.price,
-        image: product.image,
-        store: product.store,
-      });
+  const handleAddToCart = async () => {
+    try {
+      await addToCart(product.id, quantity);
+      console.log('Added to cart:', product.name, 'Quantity:', quantity);
+    } catch (error) {
+      console.error('Error adding to cart:', error);
     }
-    console.log('Added to cart:', product.name, 'Quantity:', quantity);
   };
 
   const handleShare = async () => {

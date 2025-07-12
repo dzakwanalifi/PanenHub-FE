@@ -67,6 +67,20 @@ function CheckoutPage() {
       }
     } catch (error) {
       console.error('Failed to fetch addresses:', error);
+      // Set default address jika API belum ada
+      setAddresses([
+        {
+          id: 'default-1',
+          userId: 'default-user',
+          name: 'Alamat Default',
+          phone: '081234567890',
+          address: 'Jl. Contoh No. 123',
+          city: 'Jakarta',
+          postalCode: '12345',
+          isDefault: true
+        }
+      ]);
+      setSelectedAddressId('default-1');
     }
   };
 
@@ -120,8 +134,9 @@ function CheckoutPage() {
   };
 
   const handleCheckout = async () => {
-    if (!cart || !selectedAddressId || !selectedShippingMethod) {
-      setError("Harap lengkapi alamat dan metode pengiriman.");
+    // Ganti validasi sesuai dokumentasi API - hanya perlu paymentMethod
+    if (!paymentMethod) {
+      setError("Harap pilih metode pembayaran.");
       return;
     }
 
@@ -129,87 +144,107 @@ function CheckoutPage() {
     setError(null);
 
     try {
-      const checkoutData: CheckoutRequest = {
-        cartId: cart.id,
-        addressId: selectedAddressId,
-        shippingMethod: selectedShippingMethod,
-        paymentMethod: paymentMethod,
+      // Sesuai dokumentasi, body hanya memerlukan 'payment_method'
+      const orderData = {
+        payment_method: paymentMethod,
       };
 
-      // Gunakan endpoint yang sesuai dengan dokumentasi API
-      const response = await api.post('/orders/create_from_cart', {
-        payment_method: paymentMethod
-      });
+      // Panggil endpoint yang benar
+      const response = await api.post('/orders/create_from_cart', orderData);
       
-      // Jika berhasil, arahkan ke halaman sukses dengan detail pembayaran
+      // API mengembalikan payment_details dengan checkout_url
       const { payment_details } = response.data;
       
-      if (payment_details?.checkout_url) {
-        // Redirect ke halaman pembayaran TriPay
+      // Jika ada checkout_url, arahkan pengguna ke sana untuk membayar
+      if (payment_details && payment_details.checkout_url) {
         window.location.href = payment_details.checkout_url;
       } else {
-        // Jika tidak ada URL pembayaran, arahkan ke halaman sukses
+        // Jika tidak, mungkin hanya menampilkan halaman sukses
         router.push('/checkout/success');
       }
 
     } catch (err: any) {
       console.error("Gagal membuat pesanan:", err);
-      const errorMessage = err.response?.data?.message || "Terjadi kesalahan saat memproses pesanan Anda. Silakan coba lagi.";
-      setError(errorMessage);
+      setError("Terjadi kesalahan saat memproses pesanan Anda. Silakan coba lagi.");
     } finally {
       setIsProcessing(false);
     }
   };
 
   const renderStepIndicator = () => (
-    <div className="flex items-center justify-center mb-8">
-      {steps.map((step, index) => (
-        <div key={step.id} className="flex items-center">
-          <div className={`flex items-center justify-center w-10 h-10 rounded-full ${
-            currentStep >= step.id ? 'bg-[#2E7D32] text-white' : 'bg-gray-200 text-gray-600'
-          }`}>
-            {currentStep > step.id ? (
-              <Check className="w-5 h-5" />
-            ) : (
-              <step.icon className="w-5 h-5" />
+    <div className="mb-6 md:mb-8">
+      {/* Mobile version - vertical layout */}
+      <div className="flex md:hidden flex-col space-y-3">
+        {steps.map((step) => (
+          <div key={step.id} className="flex items-center">
+            <div className={`flex items-center justify-center w-8 h-8 rounded-full ${
+              currentStep >= step.id ? 'bg-[#2E7D32] text-white' : 'bg-gray-200 text-gray-600'
+            }`}>
+              {currentStep > step.id ? (
+                <Check className="w-4 h-4" />
+              ) : (
+                <step.icon className="w-4 h-4" />
+              )}
+            </div>
+            <span className={`ml-3 text-sm font-medium ${
+              currentStep >= step.id ? 'text-[#2E7D32]' : 'text-gray-600'
+            }`}>
+              {step.title}
+            </span>
+          </div>
+        ))}
+      </div>
+
+      {/* Desktop version - horizontal layout */}
+      <div className="hidden md:flex items-center justify-center">
+        {steps.map((step, index) => (
+          <div key={step.id} className="flex items-center">
+            <div className={`flex items-center justify-center w-10 h-10 rounded-full ${
+              currentStep >= step.id ? 'bg-[#2E7D32] text-white' : 'bg-gray-200 text-gray-600'
+            }`}>
+              {currentStep > step.id ? (
+                <Check className="w-5 h-5" />
+              ) : (
+                <step.icon className="w-5 h-5" />
+              )}
+            </div>
+            <span className={`ml-2 text-sm font-medium ${
+              currentStep >= step.id ? 'text-[#2E7D32]' : 'text-gray-600'
+            }`}>
+              {step.title}
+            </span>
+            {index < steps.length - 1 && (
+              <div className={`w-12 h-0.5 mx-4 ${
+                currentStep > step.id ? 'bg-[#2E7D32]' : 'bg-gray-200'
+              }`} />
             )}
           </div>
-          <span className={`ml-2 text-sm font-medium ${
-            currentStep >= step.id ? 'text-[#2E7D32]' : 'text-gray-600'
-          }`}>
-            {step.title}
-          </span>
-          {index < steps.length - 1 && (
-            <div className={`w-12 h-0.5 mx-4 ${
-              currentStep > step.id ? 'bg-[#2E7D32]' : 'bg-gray-200'
-            }`} />
-          )}
-        </div>
-      ))}
+        ))}
+      </div>
     </div>
   );
 
   const renderAddressStep = () => (
-    <Card>
-      <h2 className="text-xl font-bold text-gray-900 mb-6">Pilih Alamat Pengiriman</h2>
+    <Card className="p-4 md:p-6">
+      <h2 className="text-lg md:text-xl font-bold text-gray-900 mb-4 md:mb-6">Pilih Alamat Pengiriman</h2>
       
       {/* Daftar alamat yang ada */}
-      <div className="space-y-4 mb-6">
+      <div className="space-y-3 md:space-y-4 mb-4 md:mb-6">
         {addresses.map((address) => (
           <div
             key={address.id}
-            className={`p-4 border rounded-lg cursor-pointer transition-colors ${
+            className={`p-3 md:p-4 border rounded-lg cursor-pointer transition-colors touch-manipulation ${
               selectedAddressId === address.id 
                 ? 'border-[#2E7D32] bg-green-50' 
-                : 'border-gray-200 hover:border-gray-300'
+                : 'border-gray-200 hover:border-gray-300 active:bg-gray-50'
             }`}
             onClick={() => setSelectedAddressId(address.id)}
           >
             <div className="flex items-start justify-between">
-              <div>
-                <h3 className="font-semibold text-gray-900">{address.name}</h3>
-                <p className="text-sm text-gray-600">{address.phone}</p>
-                <p className="text-sm text-gray-600 mt-1">
+              <div className="flex-1 min-w-0">
+                <h3 className="font-semibold text-gray-900 text-sm md:text-base">{address.name}</h3>
+                <p className="text-xs md:text-sm text-gray-600 mt-1">{address.phone}</p>
+                <p className="text-xs md:text-sm text-gray-600 mt-1 break-words">
                   {address.address}, {address.city} {address.postalCode}
                 </p>
                 {address.isDefault && (
@@ -222,7 +257,7 @@ function CheckoutPage() {
                 type="radio"
                 checked={selectedAddressId === address.id}
                 onChange={() => setSelectedAddressId(address.id)}
-                className="mt-1"
+                className="mt-1 w-4 h-4 md:w-5 md:h-5 text-[#2E7D32] focus:ring-[#2E7D32] focus:ring-2"
               />
             </div>
           </div>
@@ -234,7 +269,8 @@ function CheckoutPage() {
         <Button 
           variant="outline" 
           onClick={() => setShowNewAddressForm(true)}
-          className="mb-4"
+          className="mb-4 w-full md:w-auto"
+          size="lg"
         >
           + Tambah Alamat Baru
         </Button>
@@ -242,8 +278,8 @@ function CheckoutPage() {
 
       {/* Form alamat baru */}
       {showNewAddressForm && (
-        <Card className="mb-6">
-          <h3 className="text-lg font-semibold mb-4">Tambah Alamat Baru</h3>
+        <Card className="mb-6 p-4 md:p-6">
+          <h3 className="text-base md:text-lg font-semibold mb-4">Tambah Alamat Baru</h3>
           <form onSubmit={handleAddNewAddress} className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <Input
@@ -251,12 +287,15 @@ function CheckoutPage() {
                 value={newAddress.name}
                 onChange={(e) => setNewAddress({...newAddress, name: e.target.value})}
                 required
+                className="text-base"
               />
               <Input
                 label="Nomor Telepon"
                 value={newAddress.phone}
                 onChange={(e) => setNewAddress({...newAddress, phone: e.target.value})}
                 required
+                type="tel"
+                className="text-base"
               />
             </div>
             <Input
@@ -264,6 +303,7 @@ function CheckoutPage() {
               value={newAddress.address}
               onChange={(e) => setNewAddress({...newAddress, address: e.target.value})}
               required
+              className="text-base"
             />
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <Input
@@ -271,22 +311,27 @@ function CheckoutPage() {
                 value={newAddress.city}
                 onChange={(e) => setNewAddress({...newAddress, city: e.target.value})}
                 required
+                className="text-base"
               />
               <Input
                 label="Kode Pos"
                 value={newAddress.postalCode}
                 onChange={(e) => setNewAddress({...newAddress, postalCode: e.target.value})}
                 required
+                type="number"
+                className="text-base"
               />
             </div>
-            <div className="flex space-x-4">
-              <Button type="submit" loading={isProcessing}>
+            <div className="flex flex-col md:flex-row space-y-3 md:space-y-0 md:space-x-4">
+              <Button type="submit" loading={isProcessing} size="lg" className="w-full md:w-auto">
                 Simpan Alamat
               </Button>
               <Button 
                 type="button" 
                 variant="outline" 
                 onClick={() => setShowNewAddressForm(false)}
+                size="lg"
+                className="w-full md:w-auto"
               >
                 Batal
               </Button>
@@ -300,6 +345,7 @@ function CheckoutPage() {
           onClick={() => setCurrentStep(2)} 
           disabled={!selectedAddressId}
           size="lg"
+          className="w-full md:w-auto"
         >
           Lanjut ke Pengiriman
         </Button>
@@ -308,35 +354,35 @@ function CheckoutPage() {
   );
 
   const renderShippingStep = () => (
-    <Card>
-      <h2 className="text-xl font-bold text-gray-900 mb-6">Pilih Metode Pengiriman</h2>
+    <Card className="p-4 md:p-6">
+      <h2 className="text-lg md:text-xl font-bold text-gray-900 mb-4 md:mb-6">Pilih Metode Pengiriman</h2>
       
-      <div className="space-y-4 mb-6">
+      <div className="space-y-3 md:space-y-4 mb-4 md:mb-6">
         {shippingMethods.map((method) => (
           <div
             key={method.id}
-            className={`p-4 border rounded-lg cursor-pointer transition-colors ${
+            className={`p-3 md:p-4 border rounded-lg cursor-pointer transition-colors touch-manipulation ${
               selectedShippingMethod === method.id 
                 ? 'border-[#2E7D32] bg-green-50' 
-                : 'border-gray-200 hover:border-gray-300'
+                : 'border-gray-200 hover:border-gray-300 active:bg-gray-50'
             }`}
             onClick={() => setSelectedShippingMethod(method.id)}
           >
             <div className="flex items-center justify-between">
-              <div>
-                <h3 className="font-semibold text-gray-900">{method.name}</h3>
-                <p className="text-sm text-gray-600">{method.description}</p>
-                <p className="text-sm text-gray-600">Estimasi: {method.estimatedDays}</p>
+              <div className="flex-1 min-w-0">
+                <h3 className="font-semibold text-gray-900 text-sm md:text-base">{method.name}</h3>
+                <p className="text-xs md:text-sm text-gray-600 mt-1">{method.description}</p>
+                <p className="text-xs md:text-sm text-gray-600">Estimasi: {method.estimatedDays}</p>
               </div>
-              <div className="text-right">
-                <p className="font-semibold text-gray-900">
+              <div className="text-right ml-4">
+                <p className="font-semibold text-gray-900 text-sm md:text-base">
                   {method.price === 0 ? 'Gratis' : formatPrice(method.price)}
                 </p>
                 <input
                   type="radio"
                   checked={selectedShippingMethod === method.id}
                   onChange={() => setSelectedShippingMethod(method.id)}
-                  className="mt-2"
+                  className="mt-2 w-4 h-4 md:w-5 md:h-5 text-[#2E7D32] focus:ring-[#2E7D32] focus:ring-2"
                 />
               </div>
             </div>
@@ -344,14 +390,20 @@ function CheckoutPage() {
         ))}
       </div>
 
-      <div className="flex justify-between">
-        <Button variant="outline" onClick={() => setCurrentStep(1)}>
+      <div className="flex flex-col md:flex-row space-y-3 md:space-y-0 md:justify-between">
+        <Button 
+          variant="outline" 
+          onClick={() => setCurrentStep(1)}
+          size="lg"
+          className="w-full md:w-auto"
+        >
           Kembali ke Alamat
         </Button>
         <Button 
           onClick={() => setCurrentStep(3)} 
           disabled={!selectedShippingMethod}
           size="lg"
+          className="w-full md:w-auto"
         >
           Lanjut ke Pembayaran
         </Button>
@@ -362,30 +414,30 @@ function CheckoutPage() {
   const renderPaymentStep = () => {
     const selectedShipping = shippingMethods.find(m => m.id === selectedShippingMethod);
     const shippingCost = selectedShipping?.price || 0;
-    const subtotal = cart?.totalPrice || 0;
+    const subtotal = cart?.total_price || 0;
     const total = subtotal + shippingCost;
 
     return (
-      <div className="space-y-6">
-        <Card>
-          <h2 className="text-xl font-bold text-gray-900 mb-6">Ringkasan Pesanan</h2>
+      <div className="space-y-4 md:space-y-6">
+        <Card className="p-4 md:p-6">
+          <h2 className="text-lg md:text-xl font-bold text-gray-900 mb-4 md:mb-6">Ringkasan Pesanan</h2>
           
           {/* Order Items */}
-          <div className="space-y-4 mb-6">
+          <div className="space-y-3 md:space-y-4 mb-4 md:mb-6">
             {cart?.items.map((item) => (
-              <div key={item.id} className="flex items-center space-x-4 p-4 bg-gray-50 rounded-lg">
+              <div key={item.id} className="flex items-center space-x-3 md:space-x-4 p-3 md:p-4 bg-gray-50 rounded-lg">
                 <Image 
-                  src={item.imageUrl || '/placeholder-product.jpg'} 
-                  alt={item.name} 
-                  width={64} 
-                  height={64} 
-                  className="w-16 h-16 object-cover rounded-lg" 
+                  src={item.product.image_urls?.[0] || '/images/placeholder-product.svg'} 
+                  alt={item.product.title} 
+                  width={48} 
+                  height={48} 
+                  className="w-12 h-12 md:w-16 md:h-16 object-cover rounded-lg flex-shrink-0" 
                 />
-                <div className="flex-1">
-                  <h3 className="font-semibold text-gray-900">{item.name}</h3>
-                  <p className="text-sm text-gray-600">Jumlah: {item.quantity} {item.unit || 'pcs'}</p>
+                <div className="flex-1 min-w-0">
+                  <h3 className="font-semibold text-gray-900 text-sm md:text-base line-clamp-2">{item.product.title}</h3>
+                  <p className="text-xs md:text-sm text-gray-600 mt-1">Jumlah: {item.quantity} {item.product.unit || 'pcs'}</p>
                 </div>
-                <p className="font-semibold text-gray-900">{formatPrice(item.price * item.quantity)}</p>
+                <p className="font-semibold text-gray-900 text-sm md:text-base flex-shrink-0">{formatPrice(item.product.price * item.quantity)}</p>
               </div>
             ))}
           </div>
@@ -393,70 +445,79 @@ function CheckoutPage() {
           {/* Order Summary */}
           <div className="border-t pt-4">
             <div className="flex justify-between items-center mb-2">
-              <span className="text-gray-600">Subtotal ({cart?.totalItems} item)</span>
-              <span className="font-semibold">{formatPrice(subtotal)}</span>
+              <span className="text-gray-600 text-sm md:text-base">Subtotal ({cart?.items.reduce((sum, item) => sum + item.quantity, 0)} item)</span>
+              <span className="font-semibold text-sm md:text-base">{formatPrice(subtotal)}</span>
             </div>
             <div className="flex justify-between items-center mb-2">
-              <span className="text-gray-600">Biaya Kirim</span>
-              <span className="font-semibold">
+              <span className="text-gray-600 text-sm md:text-base">Biaya Kirim</span>
+              <span className="font-semibold text-sm md:text-base">
                 {shippingCost === 0 ? 'Gratis' : formatPrice(shippingCost)}
               </span>
             </div>
-            <div className="flex justify-between items-center mb-4 text-lg font-bold border-t pt-2">
+            <div className="flex justify-between items-center mb-4 text-base md:text-lg font-bold border-t pt-2">
               <span>Total</span>
               <span>{formatPrice(total)}</span>
             </div>
           </div>
 
           {/* Payment Method */}
-          <div className="mb-6">
-            <h3 className="text-lg font-semibold mb-4">Metode Pembayaran</h3>
-            <div className="space-y-2">
-              <label className="flex items-center space-x-3">
+          <div className="mb-4 md:mb-6">
+            <h3 className="text-base md:text-lg font-semibold mb-3 md:mb-4">Metode Pembayaran</h3>
+            <div className="space-y-3">
+              <label className="flex items-center space-x-3 p-3 border rounded-lg cursor-pointer hover:bg-gray-50 touch-manipulation">
                 <input
                   type="radio"
                   value="QRIS"
                   checked={paymentMethod === 'QRIS'}
                   onChange={(e) => setPaymentMethod(e.target.value)}
+                  className="w-4 h-4 md:w-5 md:h-5 text-[#2E7D32] focus:ring-[#2E7D32] focus:ring-2"
                 />
-                <span>QRIS (Scan & Pay)</span>
+                <span className="text-sm md:text-base">QRIS (Scan & Pay)</span>
               </label>
-              <label className="flex items-center space-x-3">
+              <label className="flex items-center space-x-3 p-3 border rounded-lg cursor-pointer hover:bg-gray-50 touch-manipulation">
                 <input
                   type="radio"
                   value="BANK_TRANSFER"
                   checked={paymentMethod === 'BANK_TRANSFER'}
                   onChange={(e) => setPaymentMethod(e.target.value)}
+                  className="w-4 h-4 md:w-5 md:h-5 text-[#2E7D32] focus:ring-[#2E7D32] focus:ring-2"
                 />
-                <span>Transfer Bank</span>
+                <span className="text-sm md:text-base">Transfer Bank</span>
               </label>
-              <label className="flex items-center space-x-3">
+              <label className="flex items-center space-x-3 p-3 border rounded-lg cursor-pointer hover:bg-gray-50 touch-manipulation">
                 <input
                   type="radio"
                   value="EWALLET"
                   checked={paymentMethod === 'EWALLET'}
                   onChange={(e) => setPaymentMethod(e.target.value)}
+                  className="w-4 h-4 md:w-5 md:h-5 text-[#2E7D32] focus:ring-[#2E7D32] focus:ring-2"
                 />
-                <span>E-Wallet (OVO, GoPay, DANA)</span>
+                <span className="text-sm md:text-base">E-Wallet (OVO, GoPay, DANA)</span>
               </label>
             </div>
           </div>
 
           {error && (
-            <div className="mb-4 p-4 bg-red-50 border border-red-200 rounded-lg flex items-start space-x-3">
-              <AlertCircle className="w-5 h-5 text-red-500 mt-0.5" />
-              <p className="text-red-700">{error}</p>
+            <div className="mb-4 p-3 md:p-4 bg-red-50 border border-red-200 rounded-lg flex items-start space-x-3">
+              <AlertCircle className="w-5 h-5 text-red-500 mt-0.5 flex-shrink-0" />
+              <p className="text-red-700 text-sm md:text-base">{error}</p>
             </div>
           )}
 
-          <div className="flex justify-between">
-            <Button variant="outline" onClick={() => setCurrentStep(2)}>
+          <div className="flex flex-col md:flex-row space-y-3 md:space-y-0 md:justify-between">
+            <Button 
+              variant="outline" 
+              onClick={() => setCurrentStep(2)}
+              size="lg"
+              className="w-full md:w-auto"
+            >
               Kembali ke Pengiriman
             </Button>
             <Button 
               onClick={handleCheckout} 
               loading={isProcessing}
               size="lg"
+              className="w-full md:w-auto"
             >
               {isProcessing ? 'Memproses...' : 'Bayar Sekarang'}
             </Button>
@@ -469,10 +530,10 @@ function CheckoutPage() {
   // Loading state
   if (isCartLoading) {
     return (
-      <div className="container mx-auto px-4 py-8">
+      <div className="container mx-auto px-4 py-8 pb-20 md:pb-8">
         <div className="text-center">
           <Spinner />
-          <p className="mt-4 text-gray-600">Memuat keranjang...</p>
+          <p className="mt-4 text-gray-600 text-sm md:text-base">Memuat keranjang...</p>
         </div>
       </div>
     );
@@ -481,12 +542,12 @@ function CheckoutPage() {
   // Empty cart state
   if (!cart || cart.items.length === 0) {
     return (
-      <div className="container mx-auto px-4 py-8">
+      <div className="container mx-auto px-4 py-8 pb-20 md:pb-8">
         <div className="text-center">
-          <h1 className="text-2xl font-bold text-gray-900 mb-4">Keranjang Anda kosong</h1>
-          <p className="text-gray-600 mb-6">Silakan tambahkan produk ke keranjang terlebih dahulu</p>
+          <h1 className="text-xl md:text-2xl font-bold text-gray-900 mb-4">Keranjang Anda kosong</h1>
+          <p className="text-gray-600 mb-6 text-sm md:text-base">Silakan tambahkan produk ke keranjang terlebih dahulu</p>
           <Link href="/products">
-            <Button>Lanjut Belanja</Button>
+            <Button size="lg" className="w-full md:w-auto">Lanjut Belanja</Button>
           </Link>
         </div>
       </div>
@@ -494,17 +555,18 @@ function CheckoutPage() {
   }
 
   return (
-    <div className="container mx-auto px-4 py-8">
+    <div className="container mx-auto px-4 py-4 md:py-8 pb-20 md:pb-8">
       <div className="max-w-4xl mx-auto">
         {/* Header */}
-        <div className="flex items-center mb-8">
+        <div className="flex items-center mb-4 md:mb-8">
           <Link href="/cart">
-            <Button variant="outline" size="sm">
-              <ArrowLeft className="w-4 h-4 mr-2" />
-              Kembali ke Keranjang
+            <Button variant="outline" size="sm" className="mr-3 md:mr-4">
+              <ArrowLeft className="w-4 h-4 mr-1 md:mr-2" />
+              <span className="hidden md:inline">Kembali ke Keranjang</span>
+              <span className="md:hidden">Kembali</span>
             </Button>
           </Link>
-          <h1 className="text-3xl font-bold text-gray-900 ml-4">Checkout</h1>
+          <h1 className="text-xl md:text-3xl font-bold text-gray-900">Checkout</h1>
         </div>
 
         {/* Step Indicator */}

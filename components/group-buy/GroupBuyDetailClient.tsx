@@ -12,23 +12,19 @@ interface GroupBuyDetailClientProps {
 export default function GroupBuyDetailClient({ groupBuy }: GroupBuyDetailClientProps) {
   const [quantity, setQuantity] = useState(1);
   const [isFavorite, setIsFavorite] = useState(false);
-  const addItem = useCartStore((state) => state.addItem);
+  const addToCart = useCartStore((state) => state.addToCart);
 
   const progressPercentage = Math.min((groupBuy.currentParticipants / groupBuy.targetParticipants) * 100, 100);
   const savings = groupBuy.originalPrice - groupBuy.pricePerUnit;
   const savingsPercentage = Math.round((savings / groupBuy.originalPrice) * 100);
 
-  const handleJoinGroupBuy = () => {
-    for (let i = 0; i < quantity; i++) {
-      addItem({
-        id: `gb-${groupBuy.id}`,
-        name: groupBuy.title,
-        price: groupBuy.pricePerUnit,
-        image: groupBuy.image,
-        store: groupBuy.store,
-      });
+  const handleJoinGroupBuy = async () => {
+    try {
+      await addToCart(`gb-${groupBuy.id}`, quantity);
+      console.log('Joined group buy:', groupBuy.title, 'Quantity:', quantity);
+    } catch (error) {
+      console.error('Error joining group buy:', error);
     }
-    console.log('Joined group buy:', groupBuy.title, 'Quantity:', quantity);
   };
 
   const getProgressColor = (percentage: number) => {

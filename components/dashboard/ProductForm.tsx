@@ -2,27 +2,57 @@
 import { useState, useEffect } from 'react';
 import { ArrowLeft, Upload, X, Save, Eye } from 'lucide-react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import ImageUploader from './ImageUploader';
-import { getMockAIResponse, AIProductResponse } from '@/lib/mock-data';
+import { useProductStore } from '@/store/productStore';
+import { Product, ProductFormData } from '@/types';
+import LoadingSpinner from '@/components/ui/Spinner';
 
 interface ProductFormProps {
   productId: string | null;
 }
 
+interface ImageProcessResult {
+  blob?: Blob;
+  url?: string;
+  index: number;
+  isNew: boolean;
+}
+
 export default function ProductForm({ productId }: ProductFormProps) {
+  const router = useRouter();
   const isNew = !productId;
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [showForm, setShowForm] = useState(!isNew);
   const [aiGenerated, setAiGenerated] = useState(false);
-  const [formData, setFormData] = useState({
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const { products, createProduct, updateProduct } = useProductStore();
+  
+  const [formData, setFormData] = useState<ProductFormData>({
     name: '',
     description: '',
     category: '',
     price: '',
     stock: '',
-    images: [] as string[],
+    images: [],
   });
-  const [hasTriggeredAI, setHasTriggeredAI] = useState(false);
+
+  // Load existing product data if editing
+  useEffect(() => {
+    if (!isNew && productId) {
+      const product = products.find(p => p.id === productId);
+      if (product) {
+        setFormData({
+          name: product.name,
+          description: product.description,
+          category: product.category,
+          price: product.price.toString(),
+          stock: product.stock.toString(),
+          images: product.images,
+        });
+      }
+    }
+  }, [isNew, productId, products]);
 
   const categories = [
     'Vegetables',
@@ -37,50 +67,26 @@ export default function ProductForm({ productId }: ProductFormProps) {
 
   // AI Analysis Effect
   useEffect(() => {
-    if (isNew && formData.images.length > 0 && !hasTriggeredAI) {
-      setHasTriggeredAI(true);
+    if (isNew && formData.images.length > 0 && !aiGenerated) {
       setIsAnalyzing(true);
       
       // Simulate AI processing delay
       setTimeout(() => {
-        const aiResponse = getMockAIResponse(formData.images[0]);
-        
-        // Populate form with AI response
+        // For now, we'll just set some placeholder data
         setFormData(prev => ({
           ...prev,
-          name: aiResponse.productName,
-          description: aiResponse.description,
-          price: aiResponse.suggestedPrice.toString(),
-          category: aiResponse.suggestedCategory,
+          name: 'Fresh Product',
+          description: 'High-quality fresh product',
+          price: '10000',
+          category: 'Vegetables',
         }));
         
         setIsAnalyzing(false);
         setShowForm(true);
         setAiGenerated(true);
-      }, 2500); // 2.5 second delay
+      }, 1500);
     }
-  }, [formData.images, isNew, hasTriggeredAI]);
-
-  // Reset AI state when images are removed
-  useEffect(() => {
-    if (formData.images.length === 0) {
-      setHasTriggeredAI(false);
-      setShowForm(!isNew);
-      setAiGenerated(false);
-      setIsAnalyzing(false);
-      
-      // Clear form data when starting over
-      if (isNew) {
-        setFormData(prev => ({
-          ...prev,
-          name: '',
-          description: '',
-          price: '',
-          category: '',
-        }));
-      }
-    }
-  }, [formData.images.length, isNew]);
+  }, [formData.images, isNew, aiGenerated]);
 
   const handleInputChange = (field: string, value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }));
@@ -90,14 +96,56 @@ export default function ProductForm({ productId }: ProductFormProps) {
     setFormData(prev => ({ ...prev, images }));
   };
 
-  const handleSaveDraft = () => {
-    console.log('Saving as draft:', formData);
-    // TODO: Implement save as draft logic
-  };
+  const handleSubmit = async (isDraft: boolean = false) => {
+    setIsSubmitting(true);
+    try {
+      const formDataToSubmit = new FormData();
+      formDataToSubmit.append('name', formData.name);
+      formDataToSubmit.append('description', formData.description);
+      formDataToSubmit.append('price', formData.price);
+      formDataToSubmit.append('stock', formData.stock);
+      formDataToSubmit.append('category', formData.category);
+      formDataToSubmit.append('status', isDraft ? 'draft' : 'active');
+      
+      // Handle image uploads
+      const convertImageToBlob = async (image: string) => {
+        const response = await fetch(image);
+        return await response.blob();
+      };
 
-  const handlePublish = () => {
-    console.log('Publishing product:', formData);
-    // TODO: Implement publish logic
+      // Process all images in parallel
+      const imagePromises = formData.images.map(async (image, index): Promise<ImageProcessResult> => {
+        if (image.startsWith('data:')) {
+          const blob = await convertImageToBlob(image);
+          return { blob, index, isNew: true };
+        }
+        return { url: image, index, isNew: false };
+      });
+
+      const processedImages = await Promise.all(imagePromises);
+
+      // Add processed images to form data
+      processedImages.forEach(result => {
+        if (result.isNew && result.blob) {
+          formDataToSubmit.append('images', result.blob, `image-${result.index}.jpg`);
+        } else if (result.url) {
+          formDataToSubmit.append('existingImages', result.url);
+        }
+      });
+
+      if (isNew) {
+        await createProduct(formDataToSubmit);
+      } else if (productId) {
+        await updateProduct(productId, formDataToSubmit);
+      }
+
+      router.push('/dashboard/products');
+    } catch (error) {
+      console.error('Failed to save product:', error);
+      alert('Failed to save product. Please try again.');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -125,7 +173,7 @@ export default function ProductForm({ productId }: ProductFormProps) {
       </div>
 
       {/* Form Content */}
-      <div className="px-4 py-6 pb-32 md:pb-6">
+      <div className="p-4 md:p-6">
         <div className="max-w-2xl mx-auto space-y-6">
           
           {/* AI Instruction for New Products */}
@@ -182,6 +230,7 @@ export default function ProductForm({ productId }: ProductFormProps) {
                       onChange={(e) => handleInputChange('name', e.target.value)}
                       placeholder="Enter product name"
                       className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#2E7D32] focus:border-transparent"
+                      required
                     />
                   </div>
 
@@ -195,6 +244,7 @@ export default function ProductForm({ productId }: ProductFormProps) {
                       placeholder="Describe your product..."
                       rows={4}
                       className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#2E7D32] focus:border-transparent resize-none"
+                      required
                     />
                   </div>
 
@@ -206,6 +256,7 @@ export default function ProductForm({ productId }: ProductFormProps) {
                       value={formData.category}
                       onChange={(e) => handleInputChange('category', e.target.value)}
                       className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#2E7D32] focus:border-transparent"
+                      required
                     >
                       <option value="">Select a category</option>
                       {categories.map((category) => (
@@ -235,10 +286,10 @@ export default function ProductForm({ productId }: ProductFormProps) {
                         type="number"
                         value={formData.price}
                         onChange={(e) => handleInputChange('price', e.target.value)}
-                        placeholder="0.00"
-                        step="0.01"
+                        placeholder="0"
                         min="0"
                         className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#2E7D32] focus:border-transparent"
+                        required
                       />
                     </div>
                   </div>
@@ -254,6 +305,7 @@ export default function ProductForm({ productId }: ProductFormProps) {
                       placeholder="0"
                       min="0"
                       className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#2E7D32] focus:border-transparent"
+                      required
                     />
                   </div>
                 </div>
@@ -268,19 +320,24 @@ export default function ProductForm({ productId }: ProductFormProps) {
         <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 p-4 z-40">
           <div className="max-w-2xl mx-auto flex items-center space-x-3">
             <button
-              onClick={handleSaveDraft}
-              className="flex-1 bg-gray-100 text-gray-700 py-3 px-4 rounded-lg font-semibold hover:bg-gray-200 transition-colors flex items-center justify-center"
+              onClick={() => handleSubmit(true)}
+              disabled={isSubmitting}
+              className="flex-1 bg-gray-100 text-gray-700 py-3 px-4 rounded-lg font-semibold hover:bg-gray-200 transition-colors flex items-center justify-center disabled:bg-gray-200 disabled:cursor-not-allowed"
             >
               <Save className="w-4 h-4 mr-2" />
               Save as Draft
             </button>
             <button
-              onClick={handlePublish}
-              disabled={isAnalyzing}
+              onClick={() => handleSubmit(false)}
+              disabled={isSubmitting}
               className="flex-1 bg-[#2E7D32] text-white py-3 px-4 rounded-lg font-semibold hover:bg-[#1B5E20] transition-colors flex items-center justify-center disabled:bg-gray-400 disabled:cursor-not-allowed"
             >
-              <Eye className="w-4 h-4 mr-2" />
-              Publish Product
+              {isSubmitting ? (
+                <LoadingSpinner className="w-4 h-4 mr-2" />
+              ) : (
+                <Eye className="w-4 h-4 mr-2" />
+              )}
+              {isSubmitting ? 'Saving...' : 'Publish Product'}
             </button>
           </div>
         </div>

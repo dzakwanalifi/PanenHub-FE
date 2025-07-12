@@ -18,7 +18,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className={plusJakartaSans.className}>
+      <body className={plusJakartaSans.className} suppressHydrationWarning={true}>
         <MainLayout>{children}</MainLayout>
         <Toaster />
       </body>

@@ -12,7 +12,8 @@ import Avatar from '../ui/Avatar';
 
 export default function Header() {
   const [hasMounted, setHasMounted] = useState(false);
-  const itemCount = useCartStore((state) => state.getItemCount());
+  const cart = useCartStore((state) => state.cart);
+  const itemCount = cart?.items.reduce((sum, item) => sum + item.quantity, 0) || 0;
   const { isLoggedIn, user, logout } = useAuthStore();
   const { activeOverlay, setActiveOverlay, closeAllOverlays } = useUIStore();
 

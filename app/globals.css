@@ -92,4 +92,30 @@
   .animate-fade-in {
     animation: fade-in 0.5s ease-out;
   }
+
+  /* Line clamp utilities */
+  .line-clamp-2 {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  /* Touch-friendly utilities */
+  .touch-manipulation {
+    touch-action: manipulation;
+  }
+
+  /* Mobile-friendly focus states */
+  @media (max-width: 768px) {
+    input[type="radio"]:focus {
+      outline: 2px solid #2E7D32;
+      outline-offset: 2px;
+    }
+    
+    button:focus {
+      outline: 2px solid #2E7D32;
+      outline-offset: 2px;
+    }
+  }
 }

@@ -16,10 +16,12 @@ export default function CartPage() {
 
   if (isLoading) {
     return (
-      <div className="container mx-auto px-4 py-8">
-        <div className="text-center">
-          <Spinner />
-          <p className="mt-4 text-gray-600">Memuat keranjang...</p>
+      <div className="min-h-screen bg-gray-50">
+        <div className="container mx-auto px-4 py-8">
+          <div className="text-center">
+            <Spinner />
+            <p className="mt-4 text-gray-600">Memuat keranjang...</p>
+          </div>
         </div>
       </div>
     );
@@ -27,17 +29,19 @@ export default function CartPage() {
 
   if (error) {
     return (
-      <div className="container mx-auto px-4 py-8">
-        <div className="text-center max-w-md mx-auto">
-          <AlertCircle className="w-24 h-24 text-red-300 mx-auto mb-4" />
-          <h1 className="text-2xl font-bold text-[#1F2937] mb-2">Terjadi Kesalahan</h1>
-          <p className="text-gray-500 mb-8">{error}</p>
-          <button
-            onClick={fetchCart}
-            className="bg-[#A5D6A7] text-[#1F2937] px-8 py-3 rounded-full font-semibold hover:bg-[#B9E4C9] transition-colors"
-          >
-            Coba Lagi
-          </button>
+      <div className="min-h-screen bg-gray-50">
+        <div className="container mx-auto px-4 py-8">
+          <div className="text-center max-w-md mx-auto">
+            <AlertCircle className="w-16 h-16 md:w-24 md:h-24 text-red-300 mx-auto mb-4" />
+            <h1 className="text-xl md:text-2xl font-bold text-[#1F2937] mb-2">Terjadi Kesalahan</h1>
+            <p className="text-gray-500 mb-8 text-sm md:text-base">{error}</p>
+            <button
+              onClick={fetchCart}
+              className="bg-[#A5D6A7] text-[#1F2937] px-6 md:px-8 py-3 rounded-full font-semibold hover:bg-[#B9E4C9] transition-colors text-sm md:text-base"
+            >
+              Coba Lagi
+            </button>
+          </div>
         </div>
       </div>
     );
@@ -45,57 +49,64 @@ export default function CartPage() {
 
   if (!cart || cart.items.length === 0) {
     return (
-      <div className="container mx-auto px-4 py-8">
-        <div className="text-center max-w-md mx-auto">
-          <ShoppingBag className="w-24 h-24 text-gray-300 mx-auto mb-4" />
-          <h1 className="text-2xl font-bold text-[#1F2937] mb-2">Keranjang Anda kosong</h1>
-          <p className="text-gray-500 mb-8">
-            Sepertinya Anda belum menambahkan produk apapun ke keranjang.
-          </p>
-          <Link
-            href="/products"
-            className="bg-[#A5D6A7] text-[#1F2937] px-8 py-3 rounded-full font-semibold hover:bg-[#B9E4C9] transition-colors"
-          >
-            Lanjut Belanja
-          </Link>
+      <div className="min-h-screen bg-gray-50">
+        <div className="container mx-auto px-4 py-8">
+          <div className="text-center max-w-md mx-auto">
+            <ShoppingBag className="w-16 h-16 md:w-24 md:h-24 text-gray-300 mx-auto mb-4" />
+            <h1 className="text-xl md:text-2xl font-bold text-[#1F2937] mb-2">Keranjang Anda kosong</h1>
+            <p className="text-gray-500 mb-8 text-sm md:text-base">
+              Sepertinya Anda belum menambahkan produk apapun ke keranjang.
+            </p>
+            <Link
+              href="/products"
+              className="bg-[#A5D6A7] text-[#1F2937] px-6 md:px-8 py-3 rounded-full font-semibold hover:bg-[#B9E4C9] transition-colors text-sm md:text-base"
+            >
+              Lanjut Belanja
+            </Link>
+          </div>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <h1 className="text-2xl md:text-3xl font-bold text-[#1F2937] mb-8 text-center">Keranjang</h1>
-      
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 pb-32 md:pb-8">
-        {/* Cart Items */}
-        <div className="lg:col-span-2 space-y-4">
-          {cart.items.map((item) => (
-            <CartItem 
-              key={item.id} 
-              item={{
-                id: item.productId,
-                cartItemId: item.id,
-                name: item.name,
-                price: item.price,
-                quantity: item.quantity,
-                image: item.imageUrl || '/placeholder-product.jpg',
-                store: 'PanenHub' // Default store name atau bisa diambil dari data produk
-              }} 
-            />
-          ))}
+    <div className="min-h-screen bg-gray-50">
+      {/* Header */}
+      <div className="bg-white border-b border-gray-200 sticky top-0 z-10">
+        <div className="container mx-auto px-4 py-4">
+          <h1 className="text-xl md:text-2xl font-bold text-[#1F2937] text-center">
+            Keranjang ({cart.items.length})
+          </h1>
         </div>
+      </div>
 
-        {/* Order Summary */}
-        <div className="hidden lg:block lg:col-span-1">
-          <OrderSummary />
+      <div className="container mx-auto px-4 py-6">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 pb-44 lg:pb-8">
+          {/* Cart Items */}
+          <div className="lg:col-span-2">
+            <div className="space-y-4">
+              {cart.items.map((item) => (
+                <CartItem 
+                  key={item.id} 
+                  item={item} 
+                />
+              ))}
+            </div>
+          </div>
+
+          {/* Desktop Order Summary */}
+          <div className="hidden lg:block lg:col-span-1">
+            <div className="sticky top-24">
+              <OrderSummary />
+            </div>
+          </div>
         </div>
       </div>
 
       {/* Mobile Sticky Order Summary */}
-      <div className="lg:hidden fixed bottom-20 left-0 right-0 z-40 bg-white border-t border-gray-200">
-        <div className="px-4 py-4">
-          <OrderSummary />
+      <div className="lg:hidden fixed bottom-16 left-0 right-0 z-40 bg-white border-t border-gray-200 shadow-lg">
+        <div className="container mx-auto px-4 py-4">
+          <OrderSummary isMobile={true} />
         </div>
       </div>
     </div>

@@ -1,30 +1,36 @@
 // types/index.ts
 
-// Item individual di dalam keranjang
-export interface CartItem {
+// Tipe untuk data produk yang ada di dalam item keranjang
+interface CartProduct {
   id: string;
-  productId: string;
-  name: string;
+  title: string;
   price: number;
-  quantity: number;
-  imageUrl: string;
-  unit?: string; // kg, pcs, dll
+  unit: string;
+  store_id: string;
+  // Tambahkan image_urls jika ada dan diperlukan di UI keranjang
+  image_urls?: string[];
+  store: {
+    store_name: string;
+  };
 }
 
-// Objek keranjang secara keseluruhan
+// Tipe untuk item individual di dalam keranjang
+export interface CartItem {
+  id: string;       // ID dari item keranjang itu sendiri (cart_item_id)
+  product_id: string;
+  quantity: number;
+  product: CartProduct; // Objek produk yang di-nest
+}
+
+// Tipe untuk objek keranjang secara keseluruhan
 export interface Cart {
-  id: string;
   items: CartItem[];
-  totalPrice: number;
-  totalItems: number;
-  userId: string;
-  createdAt?: string;
-  updatedAt?: string;
+  total_price: number;
 }
 
 // Interface untuk request API
 export interface AddToCartRequest {
-  productId: string;
+  product_id: string;
   quantity: number;
 }
 
@@ -34,10 +40,7 @@ export interface UpdateCartItemRequest {
 
 // Interface untuk checkout
 export interface CheckoutRequest {
-  cartId: string;
-  addressId: string;
-  shippingMethod: string;
-  paymentMethod?: string;
+  payment_method: string;
 }
 
 // Interface untuk alamat pengiriman
@@ -59,4 +62,29 @@ export interface ShippingMethod {
   description: string;
   price: number;
   estimatedDays: string;
+}
+
+// Product Types
+export interface Product {
+  id: string;
+  name: string;
+  description: string;
+  price: number;
+  stock: number;
+  category: string;
+  status: 'active' | 'draft' | 'out_of_stock';
+  images: string[];
+  sales: number;
+  createdAt: string;
+  updatedAt: string;
+  sellerId: string;
+}
+
+export interface ProductFormData {
+  name: string;
+  description: string;
+  price: string;
+  stock: string;
+  category: string;
+  images: string[];
 } 
