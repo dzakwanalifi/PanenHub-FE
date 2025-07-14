@@ -1,5 +1,5 @@
 'use client';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { ArrowLeft, Camera, Save } from 'lucide-react';
 import { useAuthStore } from '@/store/authStore';
 import ProtectedRoute from '@/components/auth/ProtectedRoute';
@@ -18,6 +18,18 @@ export default function ProfilePage() {
     avatar: user?.avatar || '',
   });
 
+  // Update form data when user data changes
+  useEffect(() => {
+    if (user) {
+      setFormData({
+        name: user.name || '',
+        email: user.email || '',
+        phone: user.phone || '',
+        avatar: user.avatar || '',
+      });
+    }
+  }, [user]);
+
   const handleInputChange = (field: string, value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }));
   };
@@ -31,11 +43,29 @@ export default function ProfilePage() {
 
   const handleSaveChanges = async () => {
     setLoading(true);
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    console.log('Saving profile changes:', formData);
-    setLoading(false);
-    alert('Profile updated successfully!');
+    try {
+      const { updateProfile } = useAuthStore.getState();
+      
+      // Only send changed fields
+      const updateData: any = {};
+      if (formData.name !== user?.name) updateData.name = formData.name;
+      if (formData.phone !== user?.phone) updateData.phone = formData.phone;
+      if (formData.avatar !== user?.avatar) updateData.avatar = formData.avatar;
+      
+      // Only call API if there are actual changes
+      if (Object.keys(updateData).length > 0) {
+        console.log('Saving profile changes:', updateData);
+        await updateProfile(updateData);
+        alert('Profile updated successfully!');
+      } else {
+        alert('No changes to save');
+      }
+    } catch (error) {
+      console.error('Failed to update profile:', error);
+      alert('Failed to update profile. Please try again.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (

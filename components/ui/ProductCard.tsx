@@ -37,9 +37,9 @@ export default function ProductCard({ id, name, price, originalPrice, image, rat
     return ((Math.abs(hash) % 45) / 10 + 0.5).toFixed(1);
   }, [id]);
 
-  const handleAddToCart = async () => {
+  const handleAddToCart = () => {
     try {
-      await addToCart(id, 1); // Add 1 item to cart
+      addToCart(id, 1); // Add 1 item to cart (now synchronous)
       toast.success('Produk ditambahkan ke keranjang');
     } catch (error) {
       toast.error('Gagal menambahkan produk ke keranjang');
@@ -57,7 +57,7 @@ export default function ProductCard({ id, name, price, originalPrice, image, rat
     <div className="bg-white rounded-2xl overflow-hidden shadow-md border border-gray-100 hover:shadow-lg transition-shadow duration-300">
       {/* Image Section */}
       <div className="relative h-40 bg-gray-100">
-        <Link href={`/products/${id}`}>
+        <Link href={`/products/${id}`} className="relative block w-full h-full">
           <Image
             src={image}
             alt={name}
@@ -94,38 +94,43 @@ export default function ProductCard({ id, name, price, originalPrice, image, rat
           </h3>
         </Link>
 
-        {/* Store and Distance */}
-        <div className="flex items-center text-sm text-gray-600 mb-3">
-          <MapPin className="w-3 h-3 mr-1" />
-          <span className="mr-2">{store}</span>
-          <span className="text-[#2E7D32] font-medium">• {distance} km</span>
+        {/* Store Name */}
+        <div className="flex items-center text-sm text-gray-600 mb-2">
+          <span className="font-medium">{store}</span>
         </div>
 
-        {/* Rating */}
-        <div className="flex items-center mb-3">
-          <Star className="w-4 h-4 fill-yellow-400 text-yellow-400 mr-1" />
-          <span className="text-sm font-medium text-gray-700">{rating}</span>
+        {/* Distance and Rating Row */}
+        <div className="flex items-center justify-between mb-3">
+          <div className="flex items-center text-sm text-gray-500">
+            <MapPin className="w-3 h-3 mr-1" />
+            <span>{distance} km</span>
+          </div>
+          <div className="flex items-center">
+            <Star className="w-3 h-3 fill-yellow-400 text-yellow-400 mr-1" />
+            <span className="text-sm font-medium text-gray-700">{rating}</span>
+          </div>
         </div>
 
         {/* Price Section */}
-        <div className="flex items-center justify-between">
-          <div className="flex flex-col">
+        <div className="flex flex-col space-y-3">
+          <div className="flex items-center">
             <span className="text-lg font-bold text-[#2E7D32]">
               {formatPrice(price)}
             </span>
             {hasDiscount && originalPrice && (
-              <span className="text-sm text-gray-500 line-through">
+              <span className="text-sm text-gray-500 line-through ml-2">
                 {formatPrice(originalPrice)}
               </span>
             )}
           </div>
 
-          {/* Add to Cart Button */}
+          {/* Add to Cart Button - Full Width */}
           <button
             onClick={handleAddToCart}
-            className="bg-[#2E7D32] text-white p-2 rounded-lg hover:bg-[#1B5E20] transition-colors"
+            className="w-full bg-[#2E7D32] text-white py-2 px-4 rounded-lg hover:bg-[#1B5E20] transition-colors flex items-center justify-center"
           >
-            <Plus className="w-4 h-4" />
+            <Plus className="w-4 h-4 mr-2" />
+            <span className="text-sm font-medium">Tambah ke Keranjang</span>
           </button>
         </div>
       </div>

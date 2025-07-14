@@ -16,12 +16,12 @@ export const formatPrice = (price: number): string => {
     currency: CURRENCY_CODE,
     minimumFractionDigits: 0,
     maximumFractionDigits: 0,
-  }).format(price * 1000); // Convert to proper IDR scale
+  }).format(price); // Remove * 1000 multiplication
 };
 
 // Alternative formatting for simple display
 export const formatCurrency = (amount: number): string => {
-  return `Rp ${(amount * 1000).toLocaleString('id-ID')}`;
+  return `Rp ${amount.toLocaleString('id-ID')}`;
 };
 
 export const formatPriceRange = (minPrice: number, maxPrice: number): string => {

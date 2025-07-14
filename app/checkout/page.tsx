@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { ArrowLeft, CreditCard, MapPin, User, Check, AlertCircle } from 'lucide-react';
 import { useCartStore } from '@/store/cartStore';
@@ -19,7 +19,7 @@ import { CheckoutRequest, Address, ShippingMethod } from '@/types';
 function CheckoutPage() {
   const router = useRouter();
   const { cart, isLoading: isCartLoading, fetchCart } = useCartStore();
-  const { user } = useAuthStore();
+  const { user, isLoggedIn, token, isLoading: isAuthLoading } = useAuthStore();
   
   // State untuk checkout process
   const [currentStep, setCurrentStep] = useState(1);
@@ -49,14 +49,13 @@ function CheckoutPage() {
     { id: 3, title: 'Pembayaran', icon: Check }
   ];
 
-  // Fetch data saat komponen dimount
-  useEffect(() => {
-    fetchCart();
-    fetchAddresses();
-    fetchShippingMethods();
-  }, []);
+  const fetchAddresses = useCallback(async () => {
+    // Check if user is authenticated before making API call
+    if (!isLoggedIn || !token) {
+      console.log("User not authenticated, skipping address fetch");
+      return;
+    }
 
-  const fetchAddresses = async () => {
     try {
       const response = await api.get('/user/addresses');
       setAddresses(response.data);
@@ -67,6 +66,10 @@ function CheckoutPage() {
       }
     } catch (error) {
       console.error('Failed to fetch addresses:', error);
+      // Don't show error for 401, let auth interceptor handle it
+      if ((error as any)?.response?.status === 401) {
+        return;
+      }
       // Set default address jika API belum ada
       setAddresses([
         {
@@ -82,9 +85,9 @@ function CheckoutPage() {
       ]);
       setSelectedAddressId('default-1');
     }
-  };
+  }, [isLoggedIn, token]);
 
-  const fetchShippingMethods = async () => {
+  const fetchShippingMethods = useCallback(async () => {
     try {
       const response = await api.get('/shipping/methods');
       setShippingMethods(response.data);
@@ -92,6 +95,13 @@ function CheckoutPage() {
       console.error('Failed to fetch shipping methods:', error);
       // Set default shipping methods jika API belum ada
       setShippingMethods([
+        {
+          id: 'PICKUP',
+          name: 'Ambil Sendiri',
+          description: 'Ambil langsung di toko',
+          price: 0,
+          estimatedDays: 'Langsung'
+        },
         {
           id: 'REGULER',
           name: 'Pengiriman Reguler',
@@ -103,21 +113,58 @@ function CheckoutPage() {
           id: 'EXPRESS',
           name: 'Pengiriman Express',
           description: '1-2 hari kerja',
-          price: 25000,
+          price: 20000,
           estimatedDays: '1-2 hari'
+        },
+        {
+          id: 'SAMEDAY',
+          name: 'Same Day',
+          description: 'Hari yang sama',
+          price: 30000,
+          estimatedDays: 'Hari ini'
         }
       ]);
     }
-  };
+  }, []);
+
+  // Fetch data saat komponen dimount dan auth sudah siap
+  useEffect(() => {
+    // Only fetch data if user is logged in and token is available
+    if (isLoggedIn && token) {
+      fetchCart();
+      fetchAddresses();
+      fetchShippingMethods();
+    }
+  }, [isLoggedIn, token, fetchCart, fetchAddresses, fetchShippingMethods]);
+
+  // Separate useEffect to handle auth state changes
+  useEffect(() => {
+    // If user is not logged in and we're not in loading state, redirect to login
+    if (!isLoggedIn && !isAuthLoading && typeof window !== 'undefined') {
+      // Give some time for rehydration
+      const timer = setTimeout(() => {
+        if (!isLoggedIn) {
+          router.push('/login');
+        }
+      }, 1000);
+      return () => clearTimeout(timer);
+    }
+  }, [isLoggedIn, isAuthLoading, router]);
 
   const handleAddNewAddress = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsProcessing(true);
+    setError(null); // Clear any previous errors
+    
     try {
       const response = await api.post('/user/addresses', newAddress);
+      
+      // Update addresses list with new address
       setAddresses([...addresses, response.data]);
       setSelectedAddressId(response.data.id);
       setShowNewAddressForm(false);
+      
+      // Reset form
       setNewAddress({
         name: user?.name || '',
         phone: user?.phone || '',
@@ -125,47 +172,101 @@ function CheckoutPage() {
         city: '',
         postalCode: '',
       });
+      
+      console.log('Address added successfully');
+      
     } catch (error) {
       console.error('Failed to add address:', error);
-      setError('Gagal menambah alamat baru');
+      const errorMessage = (error as any)?.response?.data?.message || 'Gagal menambah alamat baru';
+      setError(errorMessage);
     } finally {
       setIsProcessing(false);
     }
   };
 
   const handleCheckout = async () => {
-    // Ganti validasi sesuai dokumentasi API - hanya perlu paymentMethod
+    // Clear any previous errors
+    setError(null);
+    
+    // Validation
     if (!paymentMethod) {
       setError("Harap pilih metode pembayaran.");
       return;
     }
+    
+    if (!selectedAddressId) {
+      setError("Harap pilih alamat pengiriman.");
+      return;
+    }
+    
+    if (!selectedShippingMethod) {
+      setError("Harap pilih metode pengiriman.");
+      return;
+    }
 
     setIsProcessing(true);
-    setError(null);
 
     try {
-      // Sesuai dokumentasi, body hanya memerlukan 'payment_method'
+      // Prepare order data
       const orderData = {
         payment_method: paymentMethod,
       };
 
-      // Panggil endpoint yang benar
+      console.log('Creating order with data:', orderData);
+      
+      // Call the order creation endpoint
       const response = await api.post('/orders/create_from_cart', orderData);
       
-      // API mengembalikan payment_details dengan checkout_url
-      const { payment_details } = response.data;
+      console.log('Order creation response:', response.data);
       
-      // Jika ada checkout_url, arahkan pengguna ke sana untuk membayar
+      // Handle the response
+      const { message, payment_details, checkout_session_id } = response.data;
+      
+      // Show success message
+      console.log(message || 'Pesanan berhasil dibuat');
+      
+      // Redirect to payment or success page
       if (payment_details && payment_details.checkout_url) {
-        window.location.href = payment_details.checkout_url;
+        console.log('Redirecting to payment:', payment_details.checkout_url);
+        
+        // Validate URL sebelum redirect
+        try {
+          const url = new URL(payment_details.checkout_url);
+          // Hanya redirect ke URL external (payment gateway)
+          if (url.origin !== window.location.origin) {
+            window.location.href = payment_details.checkout_url;
+          } else {
+            // Jika URL internal, redirect ke success page dengan session ID
+            router.push(`/checkout/success?session=${checkout_session_id}`);
+          }
+        } catch (urlError) {
+          console.error('Invalid checkout URL:', urlError);
+          router.push(`/checkout/success?session=${checkout_session_id}`);
+        }
       } else {
-        // Jika tidak, mungkin hanya menampilkan halaman sukses
-        router.push('/checkout/success');
+        console.log('Redirecting to success page');
+        router.push(`/checkout/success?session=${checkout_session_id || ''}`);
       }
 
     } catch (err: any) {
       console.error("Gagal membuat pesanan:", err);
-      setError("Terjadi kesalahan saat memproses pesanan Anda. Silakan coba lagi.");
+      
+      // More detailed error handling
+      let errorMessage = "Terjadi kesalahan saat memproses pesanan Anda. Silakan coba lagi.";
+      
+      if (err.response?.data?.message) {
+        errorMessage = err.response.data.message;
+      } else if (err.response?.status === 400) {
+        errorMessage = "Data pesanan tidak valid. Periksa kembali informasi Anda.";
+      } else if (err.response?.status === 401) {
+        errorMessage = "Sesi Anda telah berakhir. Silakan login kembali.";
+      } else if (err.response?.status === 404) {
+        errorMessage = "Keranjang Anda kosong atau tidak ditemukan.";
+      } else if (err.response?.status >= 500) {
+        errorMessage = "Server sedang mengalami gangguan. Silakan coba lagi nanti.";
+      }
+      
+      setError(errorMessage);
     } finally {
       setIsProcessing(false);
     }
@@ -268,7 +369,10 @@ function CheckoutPage() {
       {!showNewAddressForm && (
         <Button 
           variant="outline" 
-          onClick={() => setShowNewAddressForm(true)}
+          onClick={() => {
+            setShowNewAddressForm(true);
+            setError(null); // Clear any previous errors
+          }}
           className="mb-4 w-full md:w-auto"
           size="lg"
         >
@@ -280,6 +384,14 @@ function CheckoutPage() {
       {showNewAddressForm && (
         <Card className="mb-6 p-4 md:p-6">
           <h3 className="text-base md:text-lg font-semibold mb-4">Tambah Alamat Baru</h3>
+          
+          {error && (
+            <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg flex items-start space-x-3">
+              <AlertCircle className="w-5 h-5 text-red-500 mt-0.5 flex-shrink-0" />
+              <p className="text-red-700 text-sm">{error}</p>
+            </div>
+          )}
+          
           <form onSubmit={handleAddNewAddress} className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <Input
@@ -329,7 +441,10 @@ function CheckoutPage() {
               <Button 
                 type="button" 
                 variant="outline" 
-                onClick={() => setShowNewAddressForm(false)}
+                onClick={() => {
+                  setShowNewAddressForm(false);
+                  setError(null); // Clear error when canceling
+                }}
                 size="lg"
                 className="w-full md:w-auto"
               >
@@ -342,7 +457,10 @@ function CheckoutPage() {
 
       <div className="flex justify-end">
         <Button 
-          onClick={() => setCurrentStep(2)} 
+          onClick={() => {
+            setCurrentStep(2);
+            setError(null); // Clear errors when moving to next step
+          }}
           disabled={!selectedAddressId}
           size="lg"
           className="w-full md:w-auto"
@@ -393,14 +511,20 @@ function CheckoutPage() {
       <div className="flex flex-col md:flex-row space-y-3 md:space-y-0 md:justify-between">
         <Button 
           variant="outline" 
-          onClick={() => setCurrentStep(1)}
+          onClick={() => {
+            setCurrentStep(1);
+            setError(null); // Clear errors when going back
+          }}
           size="lg"
           className="w-full md:w-auto"
         >
           Kembali ke Alamat
         </Button>
         <Button 
-          onClick={() => setCurrentStep(3)} 
+          onClick={() => {
+            setCurrentStep(3);
+            setError(null); // Clear errors when moving to next step
+          }}
           disabled={!selectedShippingMethod}
           size="lg"
           className="w-full md:w-auto"
@@ -415,6 +539,7 @@ function CheckoutPage() {
     const selectedShipping = shippingMethods.find(m => m.id === selectedShippingMethod);
     const shippingCost = selectedShipping?.price || 0;
     const subtotal = cart?.total_price || 0;
+    const discount = 0; // No discount for now
     const total = subtotal + shippingCost;
 
     return (
@@ -454,6 +579,13 @@ function CheckoutPage() {
                 {shippingCost === 0 ? 'Gratis' : formatPrice(shippingCost)}
               </span>
             </div>
+            {/* Only show discount if there's actually a discount */}
+            {discount > 0 && (
+              <div className="flex justify-between items-center mb-2">
+                <span className="text-gray-600 text-sm md:text-base">Diskon</span>
+                <span className="font-semibold text-green-600 text-sm md:text-base">-{formatPrice(discount)}</span>
+              </div>
+            )}
             <div className="flex justify-between items-center mb-4 text-base md:text-lg font-bold border-t pt-2">
               <span>Total</span>
               <span>{formatPrice(total)}</span>
@@ -507,7 +639,10 @@ function CheckoutPage() {
           <div className="flex flex-col md:flex-row space-y-3 md:space-y-0 md:justify-between">
             <Button 
               variant="outline" 
-              onClick={() => setCurrentStep(2)}
+              onClick={() => {
+                setCurrentStep(2);
+                setError(null); // Clear errors when going back
+              }}
               size="lg"
               className="w-full md:w-auto"
             >

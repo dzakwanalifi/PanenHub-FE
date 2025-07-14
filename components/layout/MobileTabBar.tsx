@@ -18,6 +18,10 @@ export default function MobileTabBar() {
   const router = useRouter();
   const pathname = usePathname();
 
+  // Don't show quick sell button on these pages
+  const hiddenPages = ['/cart', '/checkout', '/orders', '/account/profile', '/account/addresses', '/login', '/signup'];
+  const shouldShowQuickSell = !hiddenPages.some(page => pathname.startsWith(page));
+
   useEffect(() => {
     setHasMounted(true);
   }, []);
@@ -61,6 +65,16 @@ export default function MobileTabBar() {
               >
                 <Link
                   href={tab.href}
+                  prefetch={true}
+                  onMouseEnter={() => {
+                    // Preload API data saat hover (untuk desktop yang support hover)
+                    if (tab.href === '/group-buy') {
+                      fetch('/api/group-buy').catch(() => {});
+                    } else if (tab.href === '/') {
+                      fetch('/api/products').catch(() => {});
+                      fetch('/api/stores').catch(() => {});
+                    }
+                  }}
                   className="flex flex-col items-center py-2 px-1 transition-colors"
                 >
                   <div className={`relative p-2 rounded-full transition-colors ${
@@ -85,16 +99,18 @@ export default function MobileTabBar() {
           })}
         </div>
         
-        {/* Floating Quick Sell Button */}
-        <div className="absolute top-0 right-4 -mt-6">
-          <button
-            onClick={handleQuickSell}
-            className="w-12 h-12 bg-[#A5D6A7] rounded-full flex items-center justify-center shadow-lg hover:bg-[#B9E4C9] transition-colors"
-            aria-label="Quick sell your products"
-          >
-            <Plus className="w-6 h-6 text-white" />
-          </button>
-        </div>
+        {/* Floating Quick Sell Button - Only show on appropriate pages */}
+        {shouldShowQuickSell && (
+          <div className="absolute top-0 right-4 -mt-8">
+            <button
+              onClick={handleQuickSell}
+              className="w-14 h-14 bg-[#2E7D32] rounded-full flex items-center justify-center shadow-lg hover:bg-[#1B5E20] transition-colors"
+              aria-label="Quick sell your products"
+            >
+              <Plus className="w-6 h-6 text-white" />
+            </button>
+          </div>
+        )}
       </nav>
 
       {/* Quick Sell Modal */}

@@ -42,40 +42,35 @@ api.interceptors.response.use(
       
       // Try to refresh token first
       try {
-        const { useAuthStore } = await import('@/store/authStore');
-        const refreshSuccess = await useAuthStore.getState().refreshToken();
+        // For now, just clear auth and redirect instead of complex refresh logic
+        console.log('Token expired, clearing auth and redirecting');
+        setApiToken(null);
         
-        if (refreshSuccess) {
-          console.log('Token refreshed successfully, retrying request');
-          // Get the new token and set it to the retry request
-          const newToken = useAuthStore.getState().token;
-          if (newToken) {
-            // Ensure the retry request uses the new token
-            if (!error.config.headers) {
-              error.config.headers = {};
-            }
-            error.config.headers.Authorization = `Bearer ${newToken}`;
-            console.log('Retrying with new token:', newToken.substring(0, 20) + '...');
-            
-            // Mark this request as retried
-            error.config._retryCount = 1;
-          }
-          // Retry the original request with new token
-          return api(error.config);
+        // Clear auth from localStorage
+        if (typeof window !== 'undefined') {
+          localStorage.removeItem('auth-store');
+          // Dispatch logout event
+          window.dispatchEvent(new CustomEvent('auth-logout'));
+        }
+        
+        if (!isOnLoginPage() && !isOnPublicPage()) {
+          safeRedirect('/login');
         }
       } catch (refreshError) {
         console.error('Token refresh failed:', refreshError);
-      }
-      
-      // Clear token if refresh failed
-      setApiToken(null);
-      
-      // Only redirect if we're not already on login page and not on public pages
-      if (!isOnLoginPage() && !isOnPublicPage()) {
-        console.log('Redirecting to login due to 401');
-        safeRedirect('/login');
+        setApiToken(null);
+        if (!isOnLoginPage() && !isOnPublicPage()) {
+          safeRedirect('/login');
+        }
       }
     }
+    
+    // Handle network errors gracefully
+    if (error.code === 'NETWORK_ERROR' || error.message?.includes('Network Error')) {
+      console.warn('Network error detected:', error.message);
+      error.isNetworkError = true;
+    }
+    
     return Promise.reject(error);
   }
 );

@@ -40,7 +40,10 @@ export default function FeaturedProductsSection({ selectedCategory, searchTerm }
       try {
         setIsLoading(true);
         const response = await api.get('/products');
-        setProducts(response.data.data || response.data || []);
+        const productData = response.data.data || response.data || [];
+        console.log('Raw product data from API:', productData);
+        console.log('First product price:', productData[0]?.price, typeof productData[0]?.price);
+        setProducts(productData);
       } catch (error) {
         console.error('Error fetching products:', error);
         setProducts([]);

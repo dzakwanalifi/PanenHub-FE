@@ -8,30 +8,50 @@ const nextConfig = {
     domains: ['images.unsplash.com']
   },
   webpack: (config, { dev, isServer }) => {
-    // Comprehensive webpack fixes for module loading issues
+    // Simple webpack fixes for development
     if (dev && !isServer) {
-      // Fix publicPath
+      // Ensure publicPath is set correctly
       config.output.publicPath = '/_next/';
       
-      // Fix module resolution issues
+      // Fix chunk loading issues
+      config.optimization = {
+        ...config.optimization,
+        splitChunks: {
+          cacheGroups: {
+            default: false,
+            vendors: false,
+          },
+        },
+      };
+    }
+    
+    return config;
+  },
+          javascript: {
+            ...config.module.parser?.javascript,
+            strictExportPresence: false,
+          }
+        }
+      };
+
+      // Improve resolve configuration
       config.resolve = {
         ...config.resolve,
         fallback: {
           ...config.resolve.fallback,
-          fs: false,
-          net: false,
-          tls: false,
-        },
+        }
       };
-      
-      // Fix optimization for development
+
+      // Optimize split chunks for development
       config.optimization = {
         ...config.optimization,
         splitChunks: {
+          ...config.optimization.splitChunks,
           chunks: 'all',
           cacheGroups: {
+            ...config.optimization.splitChunks?.cacheGroups,
             default: {
-              minChunks: 2,
+              minChunks: 1,
               priority: -20,
               reuseExistingChunk: true,
             },
@@ -40,20 +60,12 @@ const nextConfig = {
               name: 'vendors',
               priority: -10,
               chunks: 'all',
-            },
-          },
-        },
+            }
+          }
+        }
       };
-      
-      // Prevent module factory errors
-      config.module.rules.push({
-        test: /\.js$/,
-        use: ['source-map-loader'],
-        enforce: 'pre',
-        exclude: /node_modules/,
-      });
     }
-    
+
     return config;
   },
   async headers() {

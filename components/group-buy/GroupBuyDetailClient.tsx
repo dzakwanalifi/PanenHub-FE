@@ -20,8 +20,9 @@ export default function GroupBuyDetailClient({ groupBuy }: GroupBuyDetailClientP
 
   const handleJoinGroupBuy = async () => {
     try {
-      await addToCart(`gb-${groupBuy.id}`, quantity);
-      console.log('Joined group buy:', groupBuy.title, 'Quantity:', quantity);
+      // Langsung gunakan groupBuy.id yang sudah UUID dari database
+      await addToCart(groupBuy.id, quantity);
+      console.log('Joined group buy:', groupBuy.title, 'Quantity:', quantity, 'Product ID:', groupBuy.id);
     } catch (error) {
       console.error('Error joining group buy:', error);
     }

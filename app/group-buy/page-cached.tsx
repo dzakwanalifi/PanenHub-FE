@@ -20,15 +20,14 @@ interface GroupBuy {
   maximumOrder: number;
 }
 
-// Global cache untuk instant loading
-let globalDataCache: GroupBuy[] | null = null;
-let globalCacheTimestamp: number | null = null;
-const CACHE_DURATION = 30000; // 30 detik
+// Cache untuk menyimpan data sementara
+let dataCache: GroupBuy[] | null = null;
+let cacheTimestamp: number | null = null;
+const CACHE_DURATION = 60000; // 1 menit
 
 export default function GroupBuyPage() {
-  // Initialize dengan cache jika ada
-  const [groupBuyData, setGroupBuyData] = useState<GroupBuy[]>(globalDataCache || []);
-  const [loading, setLoading] = useState(!globalDataCache);
+  const [groupBuyData, setGroupBuyData] = useState<GroupBuy[]>(dataCache || []);
+  const [loading, setLoading] = useState(!dataCache);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
@@ -36,23 +35,22 @@ export default function GroupBuyPage() {
     
     const fetchGroupBuyData = async () => {
       try {
-        // Cek cache terlebih dahulu
+        // Cek apakah data cache masih valid
         const now = Date.now();
-        if (globalDataCache && globalCacheTimestamp && (now - globalCacheTimestamp) < CACHE_DURATION) {
-          console.log('Frontend: Using cached data (instant load!)');
-          setGroupBuyData(globalDataCache);
+        if (dataCache && cacheTimestamp && (now - cacheTimestamp) < CACHE_DURATION) {
+          console.log('Frontend: Using cached data');
+          setGroupBuyData(dataCache);
           setLoading(false);
           return;
         }
 
-        console.log('Frontend: Fetching fresh group buy data...');
+        console.log('Frontend: Fetching fresh data...');
         setLoading(true);
         
-        // Fetch dengan header untuk aggressive caching
         const response = await fetch('/api/group-buy', {
-          headers: {
-            'Cache-Control': 'max-age=60, stale-while-revalidate=30'
-          }
+          // Aggressive caching strategy
+          cache: 'force-cache',
+          next: { revalidate: 60 }
         });
         
         console.log('Frontend: Response status:', response.status);
@@ -64,9 +62,9 @@ export default function GroupBuyPage() {
         const data = await response.json();
         console.log('Frontend: Received fresh data:', data);
         
-        // Update cache global
-        globalDataCache = data;
-        globalCacheTimestamp = now;
+        // Simpan ke cache
+        dataCache = data;
+        cacheTimestamp = now;
         
         setGroupBuyData(data);
       } catch (err) {
@@ -77,24 +75,24 @@ export default function GroupBuyPage() {
       }
     };
 
-    // Immediate fetch - no delay!
+    // Start fetch immediately, no delay
     fetchGroupBuyData();
   }, []);
 
-  // Prefetch untuk kunjungan berikutnya
+  // Preload effect - mulai fetch data sebelum component mount
   useEffect(() => {
-    const prefetchNextVisit = async () => {
+    // Prefetch data untuk kunjungan berikutnya
+    const prefetchData = async () => {
       try {
-        // Background prefetch setelah halaman load
         await fetch('/api/group-buy');
-        console.log('Background prefetch completed');
+        console.log('Prefetch completed');
       } catch (error) {
-        console.log('Background prefetch failed:', error);
+        console.log('Prefetch failed:', error);
       }
     };
 
-    // Delay prefetch sedikit untuk tidak mengganggu loading utama
-    const timer = setTimeout(prefetchNextVisit, 3000);
+    // Prefetch setelah component stabil
+    const timer = setTimeout(prefetchData, 2000);
     return () => clearTimeout(timer);
   }, []);
 
@@ -154,9 +152,8 @@ export default function GroupBuyPage() {
             <p className="text-red-600 mb-4">Error: {error}</p>
             <button 
               onClick={() => {
-                // Clear cache dan reload
-                globalDataCache = null;
-                globalCacheTimestamp = null;
+                dataCache = null;
+                cacheTimestamp = null;
                 window.location.reload();
               }} 
               className="bg-[#2E7D32] text-white px-4 py-2 rounded-lg hover:bg-[#1B5E20]"

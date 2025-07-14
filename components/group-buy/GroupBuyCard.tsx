@@ -67,13 +67,13 @@ export default function GroupBuyCard({
           {/* Price */}
           <div className="flex items-center space-x-2 mb-3">
             <span className="text-2xl font-bold text-[#2E7D32]">
-              ${pricePerUnit.toFixed(2)}
+              Rp{pricePerUnit.toLocaleString('id-ID')}
             </span>
             <span className="text-lg text-gray-500 line-through">
-              ${originalPrice.toFixed(2)}
+              Rp{originalPrice.toLocaleString('id-ID')}
             </span>
             <span className="text-sm text-green-600 font-medium">
-              Save ${savings.toFixed(2)}
+              Hemat Rp{savings.toLocaleString('id-ID')}
             </span>
           </div>
 
@@ -82,7 +82,7 @@ export default function GroupBuyCard({
             <div className="flex items-center justify-between mb-2">
               <div className="flex items-center text-sm text-gray-600">
                 <Users className="w-4 h-4 mr-1" />
-                {currentParticipants} of {targetParticipants} joined
+                {currentParticipants} dari {targetParticipants} bergabung
               </div>
               <span className="text-sm font-medium text-gray-900">
                 {Math.round(progressPercentage)}%
@@ -100,11 +100,11 @@ export default function GroupBuyCard({
           <div className="flex items-center justify-between">
             <div className="flex items-center text-sm text-gray-600">
               <TrendingUp className="w-4 h-4 mr-1" />
-              {targetParticipants - currentParticipants} more needed
+              {targetParticipants - currentParticipants} lagi diperlukan
             </div>
-            <button className="bg-[#2E7D32] text-white px-4 py-2 rounded-lg text-sm font-semibold hover:bg-[#1B5E20] transition-colors">
-              Join Now
-            </button>
+            <div className="bg-[#2E7D32] text-white px-4 py-2 rounded-lg text-sm font-semibold">
+              Gabung Sekarang
+            </div>
           </div>
         </div>
       </div>
