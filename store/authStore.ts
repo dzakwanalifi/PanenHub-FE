@@ -46,6 +46,7 @@ interface AuthState {
   logout: () => void;
   clearError: () => void;
   refreshToken: () => Promise<boolean>;
+  refreshUserData: () => Promise<void>;
   updateProfile: (data: UpdateProfileRequest) => Promise<void>;
 }
 
@@ -241,6 +242,36 @@ export const useAuthStore = create<AuthState>()(
             error: error.response?.data?.message || 'Gagal mengupdate profile',
             isLoading: false 
           });
+          throw error;
+        }
+      },
+
+      // Fungsi untuk refresh user data
+      refreshUserData: async () => {
+        try {
+          const { data, error } = await supabase.auth.getUser();
+          if (error) {
+            console.error('Error getting user data:', error);
+            throw error;
+          }
+
+          if (data.user) {
+            const user: User = {
+              id: data.user.id,
+              name: data.user.user_metadata?.name || data.user.email?.split('@')[0] || '',
+              email: data.user.email || '',
+              phone: data.user.user_metadata?.phone,
+              address: data.user.user_metadata?.address,
+              avatar: data.user.user_metadata?.avatar_url,
+              joinDate: data.user.created_at,
+              isSeller: data.user.user_metadata?.is_seller || false,
+            };
+
+            console.log('User data refreshed:', user);
+            set({ user });
+          }
+        } catch (error: any) {
+          console.error('Failed to refresh user data:', error);
           throw error;
         }
       },

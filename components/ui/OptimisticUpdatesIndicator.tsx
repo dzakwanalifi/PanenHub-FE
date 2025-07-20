@@ -36,7 +36,10 @@ export default function OptimisticUpdatesIndicator() {
             {update.type === 'remove' && 'Gagal menghapus dari keranjang'}
           </span>
           <button
-            onClick={() => useOptimisticStore.getState().retryUpdate(update.id)}
+            onClick={() => {
+              const { retryUpdate } = useOptimisticStore.getState();
+              retryUpdate(update.id);
+            }}
             className="ml-2 text-xs underline"
           >
             Coba lagi

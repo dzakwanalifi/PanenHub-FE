@@ -1,19 +1,15 @@
 'use client';
-import { ReactNode } from 'react';
+import React, { ReactNode, forwardRef } from 'react';
 import { Loader2 } from 'lucide-react';
 
-interface ButtonProps {
+interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   children: ReactNode;
-  onClick?: () => void;
-  type?: 'button' | 'submit' | 'reset';
   variant?: 'primary' | 'secondary' | 'outline' | 'ghost';
   size?: 'sm' | 'md' | 'lg';
-  disabled?: boolean;
   loading?: boolean;
-  className?: string;
 }
 
-export default function Button({
+const Button = forwardRef<HTMLButtonElement, ButtonProps>(({
   children,
   onClick,
   type = 'button',
@@ -22,7 +18,8 @@ export default function Button({
   disabled = false,
   loading = false,
   className = '',
-}: ButtonProps) {
+  ...props
+}, ref) => {
   const baseClasses = 'inline-flex items-center justify-center font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed';
   
   const variantClasses = {
@@ -40,13 +37,19 @@ export default function Button({
 
   return (
     <button
+      ref={ref}
       type={type}
       onClick={onClick}
       disabled={disabled || loading}
       className={`${baseClasses} ${variantClasses[variant]} ${sizeClasses[size]} ${className}`}
+      {...props}
     >
       {loading && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
       {children}
     </button>
   );
-}
+});
+
+Button.displayName = 'Button';
+
+export default Button;

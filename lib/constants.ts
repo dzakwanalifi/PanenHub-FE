@@ -21,7 +21,7 @@ export const formatPrice = (price: number): string => {
 
 // Alternative formatting for simple display
 export const formatCurrency = (amount: number): string => {
-  return `Rp ${amount.toLocaleString('id-ID')}`;
+  return `Rp ${amount.toLocaleString('id-ID', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}`;
 };
 
 export const formatPriceRange = (minPrice: number, maxPrice: number): string => {

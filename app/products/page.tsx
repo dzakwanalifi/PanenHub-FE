@@ -20,7 +20,8 @@ interface Product {
   title: string;
   price: number;
   image_urls: string[] | null;
-  stores: {
+  store_id: string;
+  stores?: {
     store_name: string;
   };
 }
@@ -35,7 +36,7 @@ export default function ProductsPage() {
   const [filters, setFilters] = useState<FilterOptions>(() => ({
     distance: 'any',
     category: 'all',
-    priceRange: [0, 200],
+    priceRange: [0, 100000], // Set to 100k IDR to accommodate Indonesian prices
     rating: 0,
   }));
 
@@ -46,8 +47,14 @@ export default function ProductsPage() {
     const fetchProducts = async () => {
       try {
         setIsLoading(true);
-        const response = await api.get('/products');
-        setProducts(response.data.data || response.data || []);
+        // Use Next.js API route instead of direct backend call
+        const response = await fetch('/api/products');
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        const data = await response.json();
+        console.log('Products API response:', data);
+        setProducts(data.data || data || []);
       } catch (error) {
         console.error('Error fetching products:', error);
         setProducts([]);
@@ -206,7 +213,7 @@ export default function ProductsPage() {
                   setFilters((prev) => ({
                     distance: 'any',
                     category: 'all',
-                    priceRange: [0, 200],
+                    priceRange: [0, 100000],
                     rating: 0,
                   }));
                 }}
@@ -295,4 +302,4 @@ export default function ProductsPage() {
       />
     </div>
   );
-} 
+}

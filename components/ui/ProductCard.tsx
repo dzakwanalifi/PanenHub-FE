@@ -4,10 +4,9 @@ import { Heart, MapPin, Star, Plus } from 'lucide-react';
 import { useCartStore } from '@/store/cartStore';
 import { useFavoriteStore } from '@/store/favoriteStore';
 import { calculateMockDistance } from '@/lib/utils';
-import { formatPrice } from '@/lib/constants';
+import { formatCurrency } from '@/lib/constants';
 import Image from 'next/image';
 import Link from 'next/link';
-import { toast } from 'sonner';
 
 interface ProductCardProps {
   id: string;
@@ -37,12 +36,16 @@ export default function ProductCard({ id, name, price, originalPrice, image, rat
     return ((Math.abs(hash) % 45) / 10 + 0.5).toFixed(1);
   }, [id]);
 
-  const handleAddToCart = () => {
+  const handleAddToCart = async () => {
     try {
-      addToCart(id, 1); // Add 1 item to cart (now synchronous)
-      toast.success('Produk ditambahkan ke keranjang');
+      console.log('Adding product to cart:', id);
+      await addToCart(id, 1); // Add 1 item to cart (now async)
+      alert('Produk berhasil ditambahkan ke keranjang!');
     } catch (error) {
-      toast.error('Gagal menambahkan produk ke keranjang');
+      console.error('Error adding to cart:', error);
+      // Show more specific error message
+      const errorMessage = error instanceof Error ? error.message : 'Gagal menambahkan produk ke keranjang';
+      alert(errorMessage);
     }
   };
 
@@ -62,6 +65,7 @@ export default function ProductCard({ id, name, price, originalPrice, image, rat
             src={image}
             alt={name}
             fill
+            priority
             className="object-cover hover:scale-105 transition-transform duration-300"
             sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 25vw"
           />
@@ -115,11 +119,11 @@ export default function ProductCard({ id, name, price, originalPrice, image, rat
         <div className="flex flex-col space-y-3">
           <div className="flex items-center">
             <span className="text-lg font-bold text-[#2E7D32]">
-              {formatPrice(price)}
+              {formatCurrency(price)}
             </span>
             {hasDiscount && originalPrice && (
               <span className="text-sm text-gray-500 line-through ml-2">
-                {formatPrice(originalPrice)}
+                {formatCurrency(originalPrice)}
               </span>
             )}
           </div>
