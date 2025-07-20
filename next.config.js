@@ -82,7 +82,7 @@ const nextConfig = {
               "style-src 'self' 'unsafe-inline'",
               "img-src 'self' data: https: blob:",
               "font-src 'self' data:",
-              "connect-src 'self' http://localhost:8080 https://api.panenhub.dev https://panenhub-backend-49479616918.us-central1.run.app https://*.supabase.co wss://*.supabase.co https://*.supabase.io wss://*.supabase.io",
+              "connect-src 'self' http://localhost:8080 https://api.panenhub.dev https://panenhub-backend-kzrzjw7s3a-et.a.run.app https://panenhub-backend-49479616918.us-central1.run.app https://*.supabase.co wss://*.supabase.co https://*.supabase.io wss://*.supabase.io",
               "frame-src 'none'",
               "object-src 'none'",
               "base-uri 'self'",
